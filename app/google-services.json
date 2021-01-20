@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "304056377441",
+    "firebase_url": "https://lambrk-messenger-74403-default-rtdb.firebaseio.com",
+    "project_id": "lambrk-messenger-74403",
+    "storage_bucket": "lambrk-messenger-74403.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:304056377441:android:2e8c6d8b030d9eae460a20",
+        "android_client_info": {
+          "package_name": "com.lahiriproductions.lambrk_messenger"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "304056377441-plb0se2rhl38v204bhriure4emh07khh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lahiriproductions.lambrk_messenger",
+            "certificate_hash": "09d9c35a8adad1e0d8c2b5a880e2366090dd7036"
+          }
+        },
+        {
+          "client_id": "304056377441-ha4c76j802b2tslneqcebbh898svcj6j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUR3r1qXniAZpzq_Bv_jKgEcQDzYLevdE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "304056377441-ha4c76j802b2tslneqcebbh898svcj6j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:dist="http://schemas.android.com/apk/distribution"
+    package="com.lahiriproductions.lambrk_messenger">
+
+    <dist:module dist:instant="true" />
+
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <application
+        android:allowBackup="true"
+        android:exported="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name="com.lahiriproductions.lambrk_messenger.WebViewActivity"></activity>
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Group.InviteGroupActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.SetupUser.SetupActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.TestActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Utils.PictureViewerActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Group.GroupPostCommentActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.ExampleActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Utils.FollowingActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Group.GroupMembersActivtiy" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Notifications.NotificationsActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Settings.SettingsChnageEmailAddressActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Settings.SettingsEditUserDetailsActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Settings.SettingsChangeUsernameActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Settings.SettingsChangeProfilePictureActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Settings.PrivacySettingsActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Settings.GeneralSettingsActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Settings.SettingsActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.VerificationCheckActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.SetupUser.SetupFinalActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.SetupUser.SetupUser3Activity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.SetupUser.SetupUser2Activity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.SetupUser.SetupUser1Activity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Settings.ChnageBackgroundActivity" />
+        <activity
+            android:name="com.lahiriproductions.lambrk_messenger.OverallProfileActivity"
+            android:windowSoftInputMode="stateHidden" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Stories.StoryLikeCommentActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Stories.StoryUserProfileViewerActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Stories.StoriesUserProfileActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Stories.StoriesActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.AddStoryActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Group.GroupSearchActivity" />
+        <activity
+            android:name="com.lahiriproductions.lambrk_messenger.Group.GroupChatActivity"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name="com.lahiriproductions.lambrk_messenger.Group.GroupActivity"
+            android:windowSoftInputMode="stateHidden" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Group.CreateGroupFinalActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Group.GroupUserProfileActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Group.CreateGroupImageActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.StartActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Group.CreateGroupActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Search.SearchActivity" />
+        <activity
+            android:name="com.lahiriproductions.lambrk_messenger.ProfileActivity"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name="com.lahiriproductions.lambrk_messenger.Chat.ChatActivity"
+            android:windowSoftInputMode="stateHidden" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.RegisterActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.LoginActivity" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat" />
+        <activity android:name="com.lahiriproductions.lambrk_messenger.Settings.AboutActivity" />
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="a19ffe9062732e48f2e6f5221ef28d256bf9e786" />
+
+        <service
+            android:name="com.lahiriproductions.lambrk_messenger.Services.FirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id" />
+        <!--
+ Set custom default icon. This is used when no icon is set for incoming notification messages.
+     See README(https://goo.gl/l4GJaQ) for more.
+        -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/notification_burnab_logo" />
+        <!--
+ Set color used with incoming notification messages. This is used when no color is set for the incoming
+             notification message. See README(https://goo.gl/6BKBk7) for more.
+        -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorAccent" />
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
+
+        <service
+            android:name="com.novoda.merlin.MerlinService"
+            android:exported="false" />
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name" />
+        <activity
+            android:name="com.facebook.CustomTabActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="@string/fb_login_protocol_scheme" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
