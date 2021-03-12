@@ -67,7 +67,7 @@ public class FollowingNotificationsAdapter extends RecyclerView.Adapter<Followin
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         mStorage = FirebaseStorage.getInstance();
-        storageReference = mStorage.getReferenceFromUrl("gs://lambrk-messenger-74403.appspot.com");
+        storageReference = mStorage.getReferenceFromUrl(mContext.getString(R.string.storage_reference_url));
 
         if (currentUser != null) {
             user_id = currentUser.getUid();

@@ -1,42 +1,42 @@
 {
   "project_info": {
-    "project_number": "304056377441",
-    "firebase_url": "https://lambrk-messenger-74403-default-rtdb.firebaseio.com",
-    "project_id": "lambrk-messenger-74403",
-    "storage_bucket": "lambrk-messenger-74403.appspot.com"
+    "project_number": "881085821671",
+    "firebase_url": "https://lambrk-messenger-5161a-default-rtdb.firebaseio.com",
+    "project_id": "lambrk-messenger-5161a",
+    "storage_bucket": "lambrk-messenger-5161a.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:304056377441:android:2e8c6d8b030d9eae460a20",
+        "mobilesdk_app_id": "1:881085821671:android:61763eef37c59d81a8e842",
         "android_client_info": {
           "package_name": "com.lahiriproductions.lambrk_messenger"
         }
       },
       "oauth_client": [
         {
-          "client_id": "304056377441-plb0se2rhl38v204bhriure4emh07khh.apps.googleusercontent.com",
+          "client_id": "881085821671-vb2mm2sq9pssfef4bgggvlttjj5vdh4i.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.lahiriproductions.lambrk_messenger",
-            "certificate_hash": "09d9c35a8adad1e0d8c2b5a880e2366090dd7036"
+            "certificate_hash": "b3e2b7e2a412f89fc456bb52df4461e213a4fa92"
           }
         },
         {
-          "client_id": "304056377441-ha4c76j802b2tslneqcebbh898svcj6j.apps.googleusercontent.com",
+          "client_id": "881085821671-n6otiadftnv8mjj0e2f5f7gnn8rohc3c.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBUR3r1qXniAZpzq_Bv_jKgEcQDzYLevdE"
+          "current_key": "AIzaSyBxCL8UST4xw-grSqmgA-8HXdlqCU8KJ9o"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "304056377441-ha4c76j802b2tslneqcebbh898svcj6j.apps.googleusercontent.com",
+              "client_id": "881085821671-n6otiadftnv8mjj0e2f5f7gnn8rohc3c.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

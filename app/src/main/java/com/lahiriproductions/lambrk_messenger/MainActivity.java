@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
-            valueEventListener = mDatabase.child("users").child(user_id).child("user_data").addValueEventListener(new ValueEventListener() {
+            mDatabase.child("users").child(user_id).child("user_data").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (!dataSnapshot.child("profile_image").exists() && !dataSnapshot.child("username").exists() && !dataSnapshot.child("name").exists() &&
@@ -158,134 +158,6 @@ public class MainActivity extends AppCompatActivity {
 
                                 }
                             });
-                            if (currentUser.getEmail().contains("angel") && currentUser.getEmail().contains("priya")) {
-                                mDatabase.child("users").child(user_id).child("one_time_play").addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        if (!dataSnapshot.exists()) {
-                                            Dialog dialog = new Dialog(MainActivity.this);
-                                            dialog.setContentView(R.layout.angel_priya_dialog_layout);
-                                            dialog.setCancelable(false);
-                                            dialog.setCanceledOnTouchOutside(false);
-                                            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                                            dialog.show();
-
-
-                                            videoView = dialog.findViewById(R.id.videoView);
-                                            ImageView imageView7 = dialog.findViewById(R.id.imageView7);
-                                            TextView textView47 = dialog.findViewById(R.id.textView47);
-                                            TextView textView48 = dialog.findViewById(R.id.textView48);
-
-                                            textView48.setVisibility(View.GONE);
-                                            videoView.setVisibility(View.GONE);
-
-                                            Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.dream_girl);
-                                            videoView.setVideoURI(uri);
-
-                                            new Handler().postDelayed(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    imageView7.setVisibility(View.GONE);
-                                                    textView47.setVisibility(View.GONE);
-                                                    videoView.setVisibility(View.VISIBLE);
-                                                    dialog.setCancelable(true);
-                                                    dialog.setCanceledOnTouchOutside(true);
-                                                    videoView.start();
-                                                    videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                                                        @Override
-                                                        public void onPrepared(MediaPlayer mp) {
-                                                            mMediaPlayer = mp;
-                                                            mp.setLooping(false);
-                                                            if (currentPosition != 0) {
-                                                                mp.seekTo(0);
-                                                                mp.start();
-                                                            }
-                                                        }
-                                                    });
-
-                                                    mDatabase.child("users").child(user_id).child("one_time_play").child("never_play").setValue(true);
-                                                }
-                                            }, 5000);
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
-                            } else {
-                                mDatabase.child("users").child(user_id).child("user_data").addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        String name = dataSnapshot.child("name").getValue().toString();
-                                        String username = dataSnapshot.child("username").getValue().toString();
-                                        if (name.contains("angel") && name.contains("priya") || username.contains("angel") && username.contains("priya")) {
-                                            mDatabase.child("users").child(user_id).child("one_time_play").addValueEventListener(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    if (!dataSnapshot.exists()) {
-                                                        Dialog dialog = new Dialog(MainActivity.this);
-                                                        dialog.setContentView(R.layout.angel_priya_dialog_layout);
-                                                        dialog.setCancelable(false);
-                                                        dialog.setCanceledOnTouchOutside(false);
-                                                        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                                                        dialog.show();
-
-
-                                                        videoView = dialog.findViewById(R.id.videoView);
-                                                        ImageView imageView7 = dialog.findViewById(R.id.imageView7);
-                                                        TextView textView47 = dialog.findViewById(R.id.textView47);
-                                                        TextView textView48 = dialog.findViewById(R.id.textView48);
-
-                                                        textView48.setVisibility(View.GONE);
-                                                        videoView.setVisibility(View.GONE);
-
-                                                        Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.dream_girl);
-                                                        videoView.setVideoURI(uri);
-
-                                                        new Handler().postDelayed(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                imageView7.setVisibility(View.GONE);
-                                                                textView47.setVisibility(View.GONE);
-                                                                videoView.setVisibility(View.VISIBLE);
-                                                                dialog.setCancelable(true);
-                                                                dialog.setCanceledOnTouchOutside(true);
-                                                                videoView.start();
-                                                                videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                                                                    @Override
-                                                                    public void onPrepared(MediaPlayer mp) {
-                                                                        mMediaPlayer = mp;
-                                                                        mp.setLooping(false);
-                                                                        if (currentPosition != 0) {
-                                                                            mp.seekTo(0);
-                                                                            mp.start();
-                                                                        }
-                                                                    }
-                                                                });
-
-                                                                mDatabase.child("users").child(user_id).child("one_time_play").child("never_play").setValue(true);
-                                                            }
-                                                        }, 4000);
-                                                    }
-                                                }
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                }
-                                            });
-                                        }
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
-                            }
                         }
                     }
                 }

@@ -21,6 +21,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.lahiriproductions.lambrk_messenger.LoginActivity;
+import com.lahiriproductions.lambrk_messenger.MainActivity;
+import com.lahiriproductions.lambrk_messenger.R;
+import com.lahiriproductions.lambrk_messenger.RegisterActivity;
 import com.lahiriproductions.lambrk_messenger.SetupUser.SetupActivity;
 import com.lahiriproductions.lambrk_messenger.Utils.Variables;
 import com.facebook.AccessToken;
@@ -104,7 +108,7 @@ public class StartActivity extends AppCompatActivity implements AdapterView.OnIt
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         mStorage = FirebaseStorage.getInstance();
-        storageReference = mStorage.getReferenceFromUrl("gs://lambrk-messenger-74403.appspot.com");
+        storageReference = mStorage.getReferenceFromUrl(getString(R.string.storage_reference_url));
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -226,7 +230,7 @@ public class StartActivity extends AppCompatActivity implements AdapterView.OnIt
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e);
-                Toast.makeText(getApplicationContext(), "Google sign in failed", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Google sign in failed. " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                 // ...
             }
         }
@@ -270,34 +274,15 @@ public class StartActivity extends AppCompatActivity implements AdapterView.OnIt
                     "\nName: " + user.getDisplayName() +
                     "\nEmail: " + user.getEmail());
             user_id = user.getUid();
-            mDatabase.child("users").child(user_id).addValueEventListener(new ValueEventListener() {
+            mDatabase.child("users").child(user_id).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
                         mDatabase.child("users").child(user_id).child("token_id").setValue(Variables.token_id);
                         Intent mainIntent = new Intent(StartActivity.this, MainActivity.class);
                         startActivity(mainIntent);
-                        finish();
+                        finishAffinity();
                     } else {
-                        Dialog dialog = new Dialog(StartActivity.this);
-                        dialog.setContentView(R.layout.dialog_signup_details_layout);
-                        dialog.getWindow().setLayout(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
-                        dialog.setCancelable(false);
-                        dialog.setCanceledOnTouchOutside(false);
-
-                        EditText etDialogAge = dialog.findViewById(R.id.etDialogAge);
-                        EditText etDialogUsername = dialog.findViewById(R.id.etDialogUsername);
-                        Button bDialogSaveDetails = dialog.findViewById(R.id.bDialogSaveDetails);
-                        ProgressBar pbDialogUserDetails = dialog.findViewById(R.id.pbDialogUserDetails);
-                        Spinner setupusergender = dialog.findViewById(R.id.setupusergender);
-
-                        final ArrayAdapter<CharSequence> genderAdapter = ArrayAdapter.createFromResource(StartActivity.this, R.array.gender, android.R.layout.simple_spinner_item);
-                        genderAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-                        setupusergender.setAdapter(genderAdapter);
-                        setupusergender.setOnItemSelectedListener(StartActivity.this);
-
-                        pbDialogUserDetails.setVisibility(View.GONE);
-
                         HashMap<String, Object> mUserDataMap = new HashMap<>();
                         mUserDataMap.put("bio", "");
                         mUserDataMap.put("name", user.getDisplayName());
@@ -314,111 +299,14 @@ public class StartActivity extends AppCompatActivity implements AdapterView.OnIt
 //                                                mDatabase.child("usernames").push().child("username").setValue(username);
 //                                    mDatabase.child("users").child(user_id).child("username").setValue(username);
                                     mDatabase.child("users").child(user.getUid()).child("user_data").child("age_change_time_period").setValue(new Date(System.currentTimeMillis()+14L * 24 * 60 * 60 * 1000));
-                                    new Handler().postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-//                                            Toast.makeText(getApplicationContext(), "Profile created successfully", Toast.LENGTH_LONG).show();
-                                            Intent finalSetupUserIntent = new Intent(StartActivity.this, SetupActivity.class);
-                                            startActivity(finalSetupUserIntent);
-                                            finish();
-                                        }
-                                    }, 500);
+                                    Intent finalSetupUserIntent = new Intent(StartActivity.this, SetupActivity.class);
+                                    startActivity(finalSetupUserIntent);
+                                    finishAffinity();
                                 }
                             }
                         });
 
-                        bDialogSaveDetails.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                pbDialogUserDetails.setVisibility(View.VISIBLE);
-                                bDialogSaveDetails.setVisibility(View.GONE);
-                                String age = etDialogAge.getText().toString();
-                                String username = etDialogUsername.getText().toString();
 
-                                if (age.isEmpty()) {
-                                    etDialogAge.setError("Please enter your age");
-                                    pbDialogUserDetails.setVisibility(View.GONE);
-                                    bDialogSaveDetails.setVisibility(View.VISIBLE);
-                                } else if (username.isEmpty()) {
-                                    etDialogUsername.setError("Please enter your username");
-                                    pbDialogUserDetails.setVisibility(View.GONE);
-                                    bDialogSaveDetails.setVisibility(View.VISIBLE);
-                                } else if (Integer.parseInt(age) < 13) {
-                                    Toast.makeText(getApplicationContext(), "Registration Failed", Toast.LENGTH_LONG).show();
-                                    dialog.dismiss();
-                                } else if (username.contains(" ")) {
-                                    Toast.makeText(getApplicationContext(), "No spaces allowed in username", Toast.LENGTH_LONG).show();
-                                    pbDialogUserDetails.setVisibility(View.GONE);
-                                    bDialogSaveDetails.setVisibility(View.VISIBLE);
-                                } else if (gender.equals("Select Gender")) {
-                                    Toast.makeText(getApplicationContext(), "Please select your gender", Toast.LENGTH_LONG).show();
-                                    pbDialogUserDetails.setVisibility(View.GONE);
-                                    bDialogSaveDetails.setVisibility(View.VISIBLE);
-                                } else {
-
-                                    /*
-                                    mDatabase.child("usernames").addValueEventListener(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            if (dataSnapshot.exists()) {
-                                                for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                                                    if (ds.child("username").getValue().equals(username)) {
-                                                        ds_username = ds.child("username").getValue().toString();
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                        }
-                                    });
-
-                                    if (ds_username != null &&  ds_username.equals(username)) {
-                                        Toast.makeText(getApplicationContext(), "Username already exists", Toast.LENGTH_LONG).show();
-                                        etDialogUsername.requestFocus();
-                                        pbDialogUserDetails.setVisibility(View.GONE);
-                                        bDialogSaveDetails.setVisibility(View.VISIBLE);
-                                    } else {
-                                        //Toast.makeText(getApplicationContext(), "insert username", Toast.LENGTH_LONG).show();
-                                        //mDatabase.child("usernames").child("username").setValue(username);
-                                        HashMap<String, Object> mUserDataMap = new HashMap<>();
-                                        mUserDataMap.put("age", "age");
-                                        mUserDataMap.put("bio", "");
-                                        mUserDataMap.put("gender", "");
-                                        mUserDataMap.put("name", user.getDisplayName());
-                                        mUserDataMap.put("username", username);
-                                        mUserDataMap.put("profile_image", user.getPhotoUrl().toString());
-                                        mUserDataMap.put("thumb_profile_image", user.getPhotoUrl().toString());
-                                        mUserDataMap.put("acc_create_timestamp", user.getMetadata().getCreationTimestamp());
-
-                                        mDatabase.child("users").child(user.getUid()).child("user_data").setValue(mUserDataMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                if (task.isSuccessful()) {
-                                                    mDatabase.child("users").child("user_id").setValue(user_id);
-                                                    mDatabase.child("usernames").push().child("username").setValue(username);
-                                                    mDatabase.child("users").child(user_id).child("username").setValue(username);
-                                                    mDatabase.child("users").child(user.getUid()).child("user_data").child("age_change_time_period").setValue(new Date(System.currentTimeMillis()+14L * 24 * 60 * 60 * 1000));
-                                                    new Handler().postDelayed(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            Toast.makeText(getApplicationContext(), "Profile created successfully", Toast.LENGTH_LONG).show();
-                                                            Intent finalSetupUserIntent = new Intent(StartActivity.this, SetupActivity.class);
-                                                            startActivity(finalSetupUserIntent);
-                                                            finish();
-                                                        }
-                                                    }, 2500);
-                                                }
-                                            }
-                                        });
-                                    }
-
-                                     */
-                                }
-                            }
-                        });
                     }
                 }
 

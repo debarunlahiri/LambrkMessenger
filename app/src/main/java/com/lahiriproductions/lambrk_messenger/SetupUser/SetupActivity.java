@@ -75,7 +75,7 @@ public class SetupActivity extends AppCompatActivity implements AdapterView.OnIt
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         mStorage = FirebaseStorage.getInstance();
-        storageReference = mStorage.getReferenceFromUrl("gs://lambrk-messenger-74403.appspot.com");
+        storageReference = mStorage.getReferenceFromUrl(getString(R.string.storage_reference_url));
 
 
         final ArrayAdapter<CharSequence> genderAdapter = ArrayAdapter.createFromResource(SetupActivity.this, R.array.gender, android.R.layout.simple_spinner_item);
@@ -171,9 +171,9 @@ public class SetupActivity extends AppCompatActivity implements AdapterView.OnIt
                                                     Toast.makeText(getApplicationContext(), "Profile created successfully", Toast.LENGTH_LONG).show();
                                                     Intent finalSetupUserIntent = new Intent(SetupActivity.this, MainActivity.class);
                                                     startActivity(finalSetupUserIntent);
-                                                    finish();
+                                                    finishAffinity();
                                                 }
-                                            }, 2500);
+                                            }, 1500);
                                         }
                                     }
                                 });

@@ -81,7 +81,7 @@ public class ExploreFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         mStorage = FirebaseStorage.getInstance();
-        storageReference = mStorage.getReferenceFromUrl("gs://lambrk-messenger-74403.appspot.com");
+        storageReference = mStorage.getReferenceFromUrl(getString(R.string.storage_reference_url));
 
         rvExplore = view.findViewById(R.id.rvExplore);
         exploreAdapter = new ExploreAdapter(mContext, exploreList, userKeysList);

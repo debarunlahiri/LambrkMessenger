@@ -96,7 +96,7 @@ public class StoriesFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         mStorage = FirebaseStorage.getInstance();
-        storageReference = mStorage.getReferenceFromUrl("gs://lambrk-messenger-74403.appspot.com");
+        storageReference = mStorage.getReferenceFromUrl(getString(R.string.storage_reference_url));
 
         storiesRV = view.findViewById(R.id.storiesRV);
         storiesAdapter = new StoriesAdapter(storiesList, mContext);

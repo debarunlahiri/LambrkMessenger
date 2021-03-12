@@ -15,7 +15,7 @@
 
     <string name="facebook_app_id">283121243088626</string>
     <string name="fb_login_protocol_scheme">fb283121243088626</string>
-    <string name="storage_reference_url">gs://lambrk-messenger-74403.appspot.com</string>
-    <string name="firebase_url">https://lambrk-messenger-74403-default-rtdb.firebaseio.com/</string>
+    <string name="storage_reference_url">gs://lambrk-messenger-5161a.appspot.com</string>
+    <string name="firebase_url">https://lambrk-messenger-5161a-default-rtdb.firebaseio.com/</string>
 
 </resources>

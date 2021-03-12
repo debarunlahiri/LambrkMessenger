@@ -68,7 +68,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         mStorage = FirebaseStorage.getInstance();
-        storageReference = mStorage.getReferenceFromUrl("gs://lambrk-messenger-74403.appspot.com");
+        storageReference = mStorage.getReferenceFromUrl(getString(R.string.storage_reference_url));
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {

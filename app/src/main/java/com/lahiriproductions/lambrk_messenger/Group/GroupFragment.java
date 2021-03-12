@@ -108,7 +108,7 @@ public class GroupFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         mStorage = FirebaseStorage.getInstance();
-        storageReference = mStorage.getReferenceFromUrl("gs://lambrk-messenger-74403.appspot.com");
+        storageReference = mStorage.getReferenceFromUrl(getString(R.string.storage_reference_url));
 
         fragmentgroupRV = view.findViewById(R.id.fragmentgroupRV);
         suggestiveGroupAdapter = new SuggestiveGroupAdapter(groupList, mContext);

@@ -82,7 +82,7 @@ public class GroupPostsAdapter extends RecyclerView.Adapter<GroupPostsAdapter.Vi
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         mStorage = FirebaseStorage.getInstance();
-        storageReference = mStorage.getReferenceFromUrl("gs://lambrk-messenger-74403.appspot.com");
+        storageReference = mStorage.getReferenceFromUrl(mContext.getString(R.string.storage_reference_url));
 
         setPostDetails(holder, position);
         setUserDetails(holder, position);
@@ -241,7 +241,7 @@ public class GroupPostsAdapter extends RecyclerView.Adapter<GroupPostsAdapter.Vi
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         mStorage = FirebaseStorage.getInstance();
-        storageReference = mStorage.getReferenceFromUrl("gs://lambrk-messenger-74403.appspot.com");
+        storageReference = mStorage.getReferenceFromUrl(mContext.getString(R.string.storage_reference_url));
         user_id = currentUser.getUid();
 
         if (groupPosts.getPost_image() == null && groupPosts.getBody() != null) {
