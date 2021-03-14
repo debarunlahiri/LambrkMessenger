@@ -162,6 +162,24 @@ public class InboxFragment extends Fragment {
 
             }
         });
+        mDatabase.child("notifications").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    if (ds.child("to_user_id").equals(user_id)) {
+                        boolean hasUserRead = (boolean) ds.child("hasUserRead").getValue();
+                        if (!hasUserRead) {
+                            inboxnotificationsnotifyIV.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         tvInboxChat.setOnClickListener(new View.OnClickListener() {
             @Override

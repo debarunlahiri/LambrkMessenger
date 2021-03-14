@@ -3,6 +3,7 @@ package com.lahiriproductions.lambrk_messenger.Inbox;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class InboxAdapter extends RecyclerView.Adapter<InboxAdapter.ViewHolder> {
 
+    private static final String TAG = InboxAdapter.class.getSimpleName();
     private List<Inbox> inboxList;
     private Context mContext;
 
@@ -116,7 +118,12 @@ public class InboxAdapter extends RecyclerView.Adapter<InboxAdapter.ViewHolder> 
                         if (isOnline == false) {
                             holder.inboxShowTimeAgoCV.setVisibility(View.VISIBLE);
                             holder.inboxuseronlineCV.setVisibility(View.GONE);
-                            holder.tvInboxShowShortTimeAgo.setText(TimeAgo.getTimeAgo(timestamp));
+                            if (TimeAgo.getTimeAgo(timestamp) == null) {
+                                holder.tvInboxShowShortTimeAgo.setText("now");
+                            } else {
+                                holder.tvInboxShowShortTimeAgo.setText(TimeAgo.getTimeAgo(timestamp));
+                            }
+                            Log.e(TAG, "onDataChange: "+ TimeAgo.getTimeAgo(timestamp));
                         } else if (isOnline == true) {
                             holder.inboxuseronlineCV.setVisibility(View.VISIBLE);
                             holder.inboxShowTimeAgoCV.setVisibility(View.GONE);

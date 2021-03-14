@@ -5,6 +5,7 @@ public class Like {
     private String formatted_date = null;
     private String user_id = null;
     private long timestamp;
+    private boolean isAdmin;
 
     private String story_id = null;
     private String story_user_id = null;
@@ -13,12 +14,13 @@ public class Like {
 
     }
 
-    public Like(String formatted_date, String user_id, long timestamp, String story_id, String story_user_id) {
+    public Like(String formatted_date, String user_id, long timestamp, String story_id, String story_user_id, boolean isAdmin) {
         this.formatted_date = formatted_date;
         this.user_id = user_id;
         this.timestamp = timestamp;
         this.story_id = story_id;
         this.story_user_id = story_user_id;
+        this.isAdmin = isAdmin;
     }
 
     public String getFormatted_date() {
@@ -59,5 +61,13 @@ public class Like {
 
     public void setStory_user_id(String story_user_id) {
         this.story_user_id = story_user_id;
+    }
+
+    public boolean getIsAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
     }
 }

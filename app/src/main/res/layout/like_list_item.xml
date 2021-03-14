@@ -28,17 +28,36 @@
 
             <TextView
                 android:id="@+id/tvLikeName"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
                 android:text="Name"
                 android:textColor="@color/colorBlack"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toStartOf="@+id/likefollowbutton"
                 app:layout_constraintStart_toEndOf="@+id/likeprofileCIV"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvAdmin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/rounded_gray_bg"
+                android:paddingStart="8dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="2dp"
+                android:text="Admin"
+                android:textColor="@color/colorWhite"
+                android:textSize="14sp"
+                android:visibility="visible"
+                app:layout_constraintEnd_toStartOf="@+id/likefollowbutton"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/tvLikeName"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView

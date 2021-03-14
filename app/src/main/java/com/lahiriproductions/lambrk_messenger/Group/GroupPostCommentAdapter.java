@@ -42,7 +42,6 @@ public class GroupPostCommentAdapter extends RecyclerView.Adapter<GroupPostComme
     private StorageReference storageReference;
 
     private String user_id;
-    private boolean userHasLikedComment;
 
     public GroupPostCommentAdapter(List<GroupPostComment> groupPostCommentList, Context mContext) {
         this.groupPostCommentList = groupPostCommentList;
@@ -77,10 +76,10 @@ public class GroupPostCommentAdapter extends RecyclerView.Adapter<GroupPostComme
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    userHasLikedComment = true;
+                    groupPostComment.setUserHasLikedComment(true);
                     holder.tvCommentLike.setText("Liked");
                 } else {
-                    userHasLikedComment = false;
+                    groupPostComment.setUserHasLikedComment(false);
                     holder.tvCommentLike.setText("Like");
                 }
             }
@@ -94,12 +93,12 @@ public class GroupPostCommentAdapter extends RecyclerView.Adapter<GroupPostComme
         holder.tvCommentLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (userHasLikedComment == true) {
+                if (groupPostComment.isUserHasLikedComment()) {
                     mDatabase.child("groups").child(groupPostComment.getGroup_id()).child("posts").child(groupPostComment.getGroup_post_id())
                             .child("comments").child(groupPostComment.getComment_id()).child("likes")
                             .child(user_id).removeValue();
                     holder.tvCommentLike.setText("Like");
-                } else if (userHasLikedComment == false) {
+                } else if (!groupPostComment.isUserHasLikedComment()) {
                     HashMap<String, Object> mGroupPostCommentLikeDataMap = new HashMap<>();
                     mGroupPostCommentLikeDataMap.put("group_id", groupPostComment.getGroup_id());
                     mGroupPostCommentLikeDataMap.put("group_post_id", groupPostComment.getGroup_post_id());

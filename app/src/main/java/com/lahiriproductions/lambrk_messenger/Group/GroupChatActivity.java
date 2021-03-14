@@ -3,6 +3,7 @@ package com.lahiriproductions.lambrk_messenger.Group;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 import com.lahiriproductions.lambrk_messenger.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -44,8 +46,9 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class GroupChatActivity extends AppCompatActivity {
 
+    private static final String TAG = GroupChatActivity.class.getSimpleName();
     private CircleImageView groupchatprofileCIV;
-    private TextView tvGroupChatName;
+    private TextView tvGroupChatName, tvGroupMembersOnline;
     private ImageButton groupchatbackIB;
     private Button groupchatsendbutton;
     private EditText etGroupChatMessage;
@@ -53,6 +56,7 @@ public class GroupChatActivity extends AppCompatActivity {
 
     private RecyclerView groupchatRV;
     private List<GroupChat> groupChatList = new ArrayList<>();
+    private List<ActiveGroupMembers> activeGroupMembersList = new ArrayList<>();
     private GroupChatAdapter groupChatAdapter;
     private LinearLayoutManager linearLayoutManager;
     private Context mContext;
@@ -65,6 +69,7 @@ public class GroupChatActivity extends AppCompatActivity {
 
     private String group_id;
     private String user_id;
+    private int active_members = 0;
 
     private ChildEventListener childEventListener;
 
@@ -85,6 +90,7 @@ public class GroupChatActivity extends AppCompatActivity {
         etGroupChatMessage = findViewById(R.id.etGroupChatMessage);
         groupchatsendbutton = findViewById(R.id.groupchatsendbutton);
         groupchatbottomCV = findViewById(R.id.groupchatbottomCV);
+        tvGroupMembersOnline = findViewById(R.id.tvGroupMembersOnline);
 
         groupchatRV = findViewById(R.id.groupchatRV);
         groupChatAdapter = new GroupChatAdapter(groupChatList, mContext);
@@ -104,6 +110,7 @@ public class GroupChatActivity extends AppCompatActivity {
         fetchGroupDetails();
         fetchMessages();
         checkUserIsInGroupOrNot();
+        checkActiveMembers();
 
         groupchatbackIB.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,6 +142,52 @@ public class GroupChatActivity extends AppCompatActivity {
                 startActivity(groupIntent);
             }
         });
+
+        tvGroupMembersOnline.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent groupIntent = new Intent(GroupChatActivity.this, GroupActiveMembersActivity.class);
+                groupIntent.putExtra("group_id", group_id);
+                startActivity(groupIntent);
+            }
+        });
+    }
+
+    private void checkActiveMembers() {
+        mDatabase.child("groups").child(group_id).child("active").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                ActiveGroupMembers activeGroupMembers = snapshot.getValue(ActiveGroupMembers.class);
+                activeGroupMembersList.add(activeGroupMembers);
+
+                if (activeGroupMembers.getIsOnline()) {
+                    active_members++;
+                    tvGroupMembersOnline.setText(String.format("%d online members", active_members));
+                }
+                Log.e(TAG, "checkActiveMembers: " + new Gson().toJson(activeGroupMembers));
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 
     private void checkUserIsInGroupOrNot() {
@@ -230,6 +283,57 @@ public class GroupChatActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+        String formattedDate = sdf.format(new Date());
+        HashMap<String, Object> mActiveDataMap = new HashMap<>();
+        mActiveDataMap.put("user_id", user_id);
+        mActiveDataMap.put("timestamp", System.currentTimeMillis());
+        mActiveDataMap.put("isOnline", false);
+        mActiveDataMap.put("formatted_date", formattedDate);
+        mActiveDataMap.put("group_id", group_id);
+        mDatabase.child("groups").child(group_id).child("active").child(user_id).setValue(mActiveDataMap);
         super.onStop();
+    }
+
+    @Override
+    protected void onResume() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+        String formattedDate = sdf.format(new Date());
+        HashMap<String, Object> mActiveDataMap = new HashMap<>();
+        mActiveDataMap.put("user_id", user_id);
+        mActiveDataMap.put("timestamp", System.currentTimeMillis());
+        mActiveDataMap.put("isOnline", true);
+        mActiveDataMap.put("formatted_date", formattedDate);
+        mActiveDataMap.put("group_id", group_id);
+        mDatabase.child("groups").child(group_id).child("active").child(user_id).setValue(mActiveDataMap);
+        super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+        String formattedDate = sdf.format(new Date());
+        HashMap<String, Object> mActiveDataMap = new HashMap<>();
+        mActiveDataMap.put("user_id", user_id);
+        mActiveDataMap.put("timestamp", System.currentTimeMillis());
+        mActiveDataMap.put("isOnline", false);
+        mActiveDataMap.put("formatted_date", formattedDate);
+        mActiveDataMap.put("group_id", group_id);
+        mDatabase.child("groups").child(group_id).child("active").child(user_id).setValue(mActiveDataMap);
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onStart() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+        String formattedDate = sdf.format(new Date());
+        HashMap<String, Object> mActiveDataMap = new HashMap<>();
+        mActiveDataMap.put("user_id", user_id);
+        mActiveDataMap.put("timestamp", System.currentTimeMillis());
+        mActiveDataMap.put("isOnline", true);
+        mActiveDataMap.put("formatted_date", formattedDate);
+        mActiveDataMap.put("group_id", group_id);
+        mDatabase.child("groups").child(group_id).child("active").child(user_id).setValue(mActiveDataMap);
+        super.onStart();
     }
 }

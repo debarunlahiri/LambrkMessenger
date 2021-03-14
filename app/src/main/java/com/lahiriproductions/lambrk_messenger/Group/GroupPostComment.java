@@ -8,6 +8,7 @@ public class GroupPostComment {
     private long timestamp;
     private String body;
     private String comment_id;
+    private boolean userHasLikedComment;
 
     GroupPostComment() {
 
@@ -68,5 +69,13 @@ public class GroupPostComment {
 
     public void setComment_id(String comment_id) {
         this.comment_id = comment_id;
+    }
+
+    public boolean isUserHasLikedComment() {
+        return userHasLikedComment;
+    }
+
+    public void setUserHasLikedComment(boolean userHasLikedComment) {
+        this.userHasLikedComment = userHasLikedComment;
     }
 }

@@ -22,6 +22,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.lahiriproductions.lambrk_messenger.MainActivity;
+import com.lahiriproductions.lambrk_messenger.Notifications.NotificationsActivity;
 import com.lahiriproductions.lambrk_messenger.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -87,37 +88,37 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         String body = data.get("body");
         String icon = data.get("icon");
         String type = data.get("type");
-        String receiver_user_id = data.get("receiver_user_id");
-//        String sender_user_id = data.get("sender_user_id");
+        String to_user_id = data.get("to_user_id");
+        String from_user_id = data.get("from_user_id");
 
 
         if (mCurrentuser != null) {
             icon_bitmap = getBitmapfromUrl(icon);
+            if (!to_user_id.equals(mCurrentuser.getUid())) {
+                if (type.equals("message_notification")) {
 
-            if (type.equals("message_notification")) {
 
+                    // Create an Intent for the activity you want to start
+                    Intent resultIntent = new Intent(this, MainActivity.class);
+                    resultIntent.putExtra("messageNotification", "messageNotification");
+                    // Create the TaskStackBuilder and add the intent, which inflates the back stack
+                    TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+                    stackBuilder.addNextIntentWithParentStack(resultIntent);
+                    // Get the PendingIntent containing the entire back stack
+                    PendingIntent resultPendingIntent =
+                            stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
-                // Create an Intent for the activity you want to start
-                Intent resultIntent = new Intent(this, MainActivity.class);
-                resultIntent.putExtra("messageNotification", "messageNotification");
-                // Create the TaskStackBuilder and add the intent, which inflates the back stack
-                TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-                stackBuilder.addNextIntentWithParentStack(resultIntent);
-                // Get the PendingIntent containing the entire back stack
-                PendingIntent resultPendingIntent =
-                        stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "1")
-                        .setSmallIcon(R.drawable.notification_burnab_logo)
-                        .setContentTitle(title)
-                        .setContentText(body)
-                        .setAutoCancel(true)
-                        .setLargeIcon(getCircleBitmap(icon_bitmap))
-                        .setPriority(NotificationCompat.PRIORITY_HIGH);
-                builder.setContentIntent(resultPendingIntent);
-                int notificationId = 1;
-                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.notify(1, builder.build());
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "1")
+                            .setSmallIcon(R.drawable.notification_burnab_logo)
+                            .setContentTitle(title)
+                            .setContentText(body)
+                            .setAutoCancel(true)
+                            .setLargeIcon(getCircleBitmap(icon_bitmap))
+                            .setPriority(NotificationCompat.PRIORITY_HIGH);
+                    builder.setContentIntent(resultPendingIntent);
+                    int notificationId = 1;
+                    NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.notify(1, builder.build());
 
             /*
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "1")
@@ -129,50 +130,94 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             int notificationId = 1;
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(1, builder.build()); */
-            } else if (type.equals("follow_notification")) {
-                // Create an Intent for the activity you want to start
-                Intent resultIntent = new Intent(this, MainActivity.class);
-                resultIntent.putExtra("followNotification", "followNotification");
-                // Create the TaskStackBuilder and add the intent, which inflates the back stack
-                TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-                stackBuilder.addNextIntentWithParentStack(resultIntent);
-                // Get the PendingIntent containing the entire back stack
-                PendingIntent resultPendingIntent =
-                        stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+                } else if (type.equals("follow_notification")) {
+                    // Create an Intent for the activity you want to start
+                    Intent resultIntent = new Intent(this, NotificationsActivity.class);
+                    resultIntent.putExtra("followNotification", "followNotification");
+                    // Create the TaskStackBuilder and add the intent, which inflates the back stack
+                    TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+                    stackBuilder.addNextIntentWithParentStack(resultIntent);
+                    // Get the PendingIntent containing the entire back stack
+                    PendingIntent resultPendingIntent =
+                            stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "1")
-                        .setSmallIcon(R.drawable.notification_burnab_logo)
-                        .setContentTitle("@" + title + " has followed you")
-                        .setLargeIcon(getCircleBitmap(icon_bitmap))
-                        .setAutoCancel(true)
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-                builder.setContentIntent(resultPendingIntent);
-                int notificationId = 1;
-                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.notify(1, builder.build());
-            } else if (type.equals("post_notification")) {
-                String post_notification_type = data.get("post_notification_type");
-                if (post_notification_type.equals("notification_post_liked")) {
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "1")
                             .setSmallIcon(R.drawable.notification_burnab_logo)
-                            .setContentTitle("@" + title + " has liked your post")
+                            .setContentTitle("@" + title + " has followed you")
                             .setLargeIcon(getCircleBitmap(icon_bitmap))
+                            .setAutoCancel(true)
                             .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                    builder.setContentIntent(resultPendingIntent);
                     int notificationId = 1;
                     NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                     notificationManager.notify(1, builder.build());
-                } else if (post_notification_type.equals("notification_post_comment")) {
+                } else if (type.equals("post_notification")) {
+                    String post_notification_type = data.get("post_notification_type");
+                    if (post_notification_type.equals("notification_post_liked")) {
+                        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "1")
+                                .setSmallIcon(R.drawable.notification_burnab_logo)
+                                .setContentTitle("@" + title + " has liked your post")
+                                .setLargeIcon(getCircleBitmap(icon_bitmap))
+                                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                        int notificationId = 1;
+                        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                        notificationManager.notify(1, builder.build());
+                    } else if (post_notification_type.equals("notification_post_comment")) {
+                        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "1")
+                                .setSmallIcon(R.drawable.notification_burnab_logo)
+                                .setContentTitle("@" + title + " has commented on your post")
+                                .setLargeIcon(getCircleBitmap(icon_bitmap))
+                                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                        int notificationId = 1;
+                        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                        notificationManager.notify(1, builder.build());
+                    }
+                } else if (type.equals("story_notification")) {
+                    // Create an Intent for the activity you want to start
+                    Intent resultIntent = new Intent(this, NotificationsActivity.class);
+                    resultIntent.putExtra("storyLikeNotification", "storyLikeNotification");
+                    // Create the TaskStackBuilder and add the intent, which inflates the back stack
+                    TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+                    stackBuilder.addNextIntentWithParentStack(resultIntent);
+                    // Get the PendingIntent containing the entire back stack
+                    PendingIntent resultPendingIntent =
+                            stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "1")
                             .setSmallIcon(R.drawable.notification_burnab_logo)
-                            .setContentTitle("@" + title + " has commented on your post")
+                            .setContentTitle("@" + title + " " + body)
                             .setLargeIcon(getCircleBitmap(icon_bitmap))
+                            .setAutoCancel(true)
                             .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                    builder.setContentIntent(resultPendingIntent);
+                    int notificationId = 1;
+                    NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.notify(1, builder.build());
+                } else if (type.equals("story_comment_notification")) {
+                    // Create an Intent for the activity you want to start
+                    Intent resultIntent = new Intent(this, NotificationsActivity.class);
+                    resultIntent.putExtra("storyLikeNotification", "storyLikeNotification");
+                    // Create the TaskStackBuilder and add the intent, which inflates the back stack
+                    TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+                    stackBuilder.addNextIntentWithParentStack(resultIntent);
+                    // Get the PendingIntent containing the entire back stack
+                    PendingIntent resultPendingIntent =
+                            stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "1")
+                            .setSmallIcon(R.drawable.notification_burnab_logo)
+                            .setContentTitle("@" + title + " has commented on your story ")
+                            .setContentText(body)
+                            .setLargeIcon(getCircleBitmap(icon_bitmap))
+                            .setAutoCancel(true)
+                            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                    builder.setContentIntent(resultPendingIntent);
                     int notificationId = 1;
                     NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                     notificationManager.notify(1, builder.build());
                 }
-
             }
+
         }
     }
 

@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.lahiriproductions.lambrk_messenger.Group.GroupPosts;
+import com.lahiriproductions.lambrk_messenger.Group.GroupPostsAdapter;
 import com.lahiriproductions.lambrk_messenger.R;
 import com.lahiriproductions.lambrk_messenger.Search.SearchActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -46,7 +48,6 @@ public class ExploreFragment extends Fragment {
 
     private RecyclerView rvExplore;
     private List<Explore> exploreList = new ArrayList<>();
-    private List<String> userKeysList = new ArrayList<>();
     private ExploreAdapter exploreAdapter;
     private LinearLayoutManager linearLayoutManager;
 
@@ -84,33 +85,31 @@ public class ExploreFragment extends Fragment {
         storageReference = mStorage.getReferenceFromUrl(getString(R.string.storage_reference_url));
 
         rvExplore = view.findViewById(R.id.rvExplore);
-        exploreAdapter = new ExploreAdapter(mContext, exploreList, userKeysList);
+        exploreAdapter = new ExploreAdapter(mContext, exploreList, "for_explore");
         linearLayoutManager = new LinearLayoutManager(mContext);
         rvExplore.setAdapter(exploreAdapter);
         rvExplore.setLayoutManager(linearLayoutManager);
 
         if (currentUser != null) {
             String user_id = currentUser.getUid();
-            if (isVisible()) {
-                mDatabase.child("users").child(user_id).child("user_data").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            if (dataSnapshot.child("profile_image").exists()) {
-                                String profile_image = dataSnapshot.child("profile_image").getValue().toString();
-                                Glide.with(mContext).load(profile_image).into(groupfragmentprofileCIV);
-                            }
+            mDatabase.child("users").child(user_id).child("user_data").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        if (dataSnapshot.child("profile_image").exists()) {
+                            String profile_image = dataSnapshot.child("profile_image").getValue().toString();
+                            Glide.with(mContext).load(profile_image).into(groupfragmentprofileCIV);
                         }
                     }
+                }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                    }
-                });
+                }
+            });
 
-                initExplore();
-            }
+            initExplore();
 
 
         }
@@ -125,26 +124,15 @@ public class ExploreFragment extends Fragment {
     }
 
     private void initExplore() {
-        mDatabase.child("users").addChildEventListener(new ChildEventListener() {
+        mDatabase.child("group_posts").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                String user_id = dataSnapshot.getKey();
-                userKeysList.add(user_id);
-                mDatabase.child("users").child(user_id).child("user_data").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            Explore explore = dataSnapshot.getValue(Explore.class);
-                            exploreList.add(explore);
-                            exploreAdapter.notifyDataSetChanged();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
+                if (dataSnapshot.exists()) {
+                    Explore explore = dataSnapshot.getValue(Explore.class);
+                    exploreList.add(explore);
+                    exploreAdapter.notifyDataSetChanged();
+                } else {
+                }
             }
 
             @Override

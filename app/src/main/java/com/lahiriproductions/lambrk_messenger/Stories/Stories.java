@@ -8,18 +8,22 @@ public class Stories {
     private long timestamp;
     private String story_id = null;
     private String story_image = null;
+    private String body;
+
+    private boolean userHasLiked = false;
 
     public Stories() {
 
     }
 
-    public Stories(String user_id, String story_caption, String formatted_date, long timestamp, String story_id, String story_image) {
+    public Stories(String user_id, String story_caption, String formatted_date, long timestamp, String story_id, String story_image, String body) {
         this.user_id = user_id;
         this.story_caption = story_caption;
         this.formatted_date = formatted_date;
         this.timestamp = timestamp;
         this.story_id = story_id;
         this.story_image = story_image;
+        this.body = body;
     }
 
     public String getUser_id() {
@@ -68,5 +72,21 @@ public class Stories {
 
     public void setStory_image(String story_image) {
         this.story_image = story_image;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public boolean isUserHasLiked() {
+        return userHasLiked;
+    }
+
+    public void setUserHasLiked(boolean userHasLiked) {
+        this.userHasLiked = userHasLiked;
     }
 }

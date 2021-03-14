@@ -10,6 +10,7 @@ public class GroupPosts {
     private String formatted_date;
     private String post_image = null;
     private String thumb_post_image = null;
+    private boolean userHasliked = false;
 
     public GroupPosts() {
 
@@ -88,5 +89,13 @@ public class GroupPosts {
 
     public void setThumb_post_image(String thumb_post_image) {
         this.thumb_post_image = thumb_post_image;
+    }
+
+    public boolean isUserHasliked() {
+        return userHasliked;
+    }
+
+    public void setUserHasliked(boolean userHasliked) {
+        this.userHasliked = userHasliked;
     }
 }

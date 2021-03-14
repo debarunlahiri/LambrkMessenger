@@ -2,6 +2,7 @@ package com.lahiriproductions.lambrk_messenger.Notifications;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.GsonBuilder;
 import com.lahiriproductions.lambrk_messenger.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -36,6 +38,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class NotificationsActivity extends AppCompatActivity {
 
+    private static final String TAG = NotificationsActivity.class.getSimpleName();
     private Toolbar inboxnotificationstoolbar;
 
     private TextView textView40;
@@ -54,7 +57,7 @@ public class NotificationsActivity extends AppCompatActivity {
     private List<FollowingNotifications> followingNotificationsList = new ArrayList<>();
     private LinearLayoutManager linearLayoutManager;
     private NotificationsAdapter notificationsAdapter;
-    private FollowingNotificationsAdapter followingNotificationsAdapter;
+//    private FollowingNotificationsAdapter followingNotificationsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,11 +82,11 @@ public class NotificationsActivity extends AppCompatActivity {
         textView40 = findViewById(R.id.textView40);
 
         inboxnotificationsRV = findViewById(R.id.inboxnotificationsRV);
-        notificationsAdapter = new NotificationsAdapter(notificationsList, mContext);
-        followingNotificationsAdapter = new FollowingNotificationsAdapter(mContext, followingNotificationsList);
+        notificationsAdapter = new NotificationsAdapter(mContext, notificationsList);
+//        followingNotificationsAdapter = new FollowingNotificationsAdapter(mContext, followingNotificationsList);
         linearLayoutManager = new LinearLayoutManager(mContext);
 //        inboxnotificationsRV.setAdapter(notificationsAdapter);
-        inboxnotificationsRV.setAdapter(followingNotificationsAdapter);
+        inboxnotificationsRV.setAdapter(notificationsAdapter);
         inboxnotificationsRV.setLayoutManager(linearLayoutManager);
         linearLayoutManager.setStackFromEnd(true);
         linearLayoutManager.setReverseLayout(true);
@@ -96,12 +99,19 @@ public class NotificationsActivity extends AppCompatActivity {
 
         user_id = currentUser.getUid();
 
-        mDatabase.child("notifications").child("following").child(user_id).addChildEventListener(new ChildEventListener() {
+        mDatabase.child("notifications").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                FollowingNotifications followingNotifications = dataSnapshot.getValue(FollowingNotifications.class);
-                followingNotificationsList.add(followingNotifications);
-                followingNotificationsAdapter.notifyDataSetChanged();
+//                FollowingNotifications followingNotifications = dataSnapshot.getValue(FollowingNotifications.class);
+//                followingNotificationsList.add(followingNotifications);
+//                followingNotificationsAdapter.notifyDataSetChanged();
+
+                Notifications notifications = dataSnapshot.getValue(Notifications.class);
+                if (!(notifications.getNotification_type().equalsIgnoreCase("following_notification") && notifications.getFrom_user_id().equals(user_id))) {
+                    notificationsList.add(notifications);
+                }
+                notificationsAdapter.notifyDataSetChanged();
+                Log.d(TAG, "notificationList: " + new GsonBuilder().setPrettyPrinting().create().toJson(notificationsList));
             }
 
             @Override
@@ -125,135 +135,12 @@ public class NotificationsActivity extends AppCompatActivity {
             }
         });
 
-//        mDatabase.child("requests").child("following").child(user_id).addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//                if (dataSnapshot.exists()) {
-//                    textView40.setVisibility(View.GONE);
-//                    Notifications notifications = dataSnapshot.getValue(Notifications.class);
-//                    notificationsList.add(notifications);
-//                    notificationsAdapter.notifyDataSetChanged();
-//                } else {
-//                    textView40.setVisibility(View.VISIBLE);
-//                }
-//
-//            }
-//
-//            @Override
-//            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//            }
-//
-//            @Override
-//            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-//                String key = dataSnapshot.getKey();
-//                for (Notifications notifications : notificationsList) {
-//                    if (key.equals(notifications.getUser_id())) {
-//                        notificationsList.remove(notifications);
-//                        notificationsAdapter.notifyDataSetChanged();
-//                        break;
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
+
+
 
     }
 
-    public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdapter.ViewHolder> {
 
-        private List<Notifications> notificationsList;
-        private Context mContext;
-
-        public NotificationsAdapter(List<Notifications> notificationsList, Context mContext) {
-            this.notificationsList = notificationsList;
-            this.mContext = mContext;
-        }
-
-        @NonNull
-        @Override
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.follow_request_list_item, parent, false);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            Notifications notifications = notificationsList.get(position);
-
-            mDatabase = FirebaseDatabase.getInstance(getString(R.string.firebase_url)).getReference();;
-            mAuth = FirebaseAuth.getInstance();
-            currentUser = mAuth.getCurrentUser();
-            mStorage = FirebaseStorage.getInstance();
-            storageReference = mStorage.getReferenceFromUrl(getString(R.string.storage_reference_url));
-
-            user_id = currentUser.getUid();
-
-            mDatabase.child("users").child(notifications.getUser_id()).child("user_data").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    String profile_image = dataSnapshot.child("profile_image").getValue().toString();
-                    String username = dataSnapshot.child("username").getValue().toString();
-
-                    Glide.with(mContext).load(profile_image).thumbnail(0.1f).into(holder.followrequestprofileCIV);
-                    holder.tvFollowRequestUsername.setText(username);
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-
-            holder.followrequestdeletebutton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mDatabase.child("requests").child("following").child(user_id).child(notifications.getUser_id()).removeValue();
-                }
-            });
-
-            holder.followrequestconfirmbutton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    HashMap<String, Object> mFollowDataMap = new HashMap<>();
-                    mFollowDataMap.put("user_id", user_id);
-                    mDatabase.child("following").child(user_id).child(notifications.getUser_id()).setValue(mFollowDataMap);
-                    mDatabase.child("follower").child(notifications.getUser_id()).child(user_id).setValue(mFollowDataMap);
-                    mDatabase.child("requests").child("following").child(user_id).child(notifications.getUser_id()).removeValue();
-                }
-            });
-        }
-
-        @Override
-        public int getItemCount() {
-            return notificationsList.size();
-        }
-
-        public class ViewHolder extends RecyclerView.ViewHolder {
-
-            private CircleImageView followrequestprofileCIV;
-            private TextView tvFollowRequestUsername;
-            private Button followrequestconfirmbutton, followrequestdeletebutton;
-
-            public ViewHolder(@NonNull View itemView) {
-                super(itemView);
-
-                followrequestprofileCIV = itemView.findViewById(R.id.followrequestprofileCIV);
-                tvFollowRequestUsername = itemView.findViewById(R.id.tvFollowRequestUsername);
-                followrequestconfirmbutton = itemView.findViewById(R.id.followrequestconfirmbutton);
-                followrequestdeletebutton = itemView.findViewById(R.id.followrequestdeletebutton);
-            }
-        }
-    }
 
     @Override
     protected void onStop() {

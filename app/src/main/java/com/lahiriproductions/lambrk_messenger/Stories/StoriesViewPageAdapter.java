@@ -89,6 +89,7 @@ public class StoriesViewPageAdapter extends PagerAdapter implements View.OnTouch
         CardView storybottomCV = view.findViewById(R.id.storybottomCV);
         RelativeTimeTextView tvStoriesTime = view.findViewById(R.id.tvStoriesTime);
         TextView tvStoriesLikeCount = view.findViewById(R.id.tvStoriesLikeCount);
+        TextView tvStoryBody = view.findViewById(R.id.tvStoryBody);
         TextView tvStoriesCommentCount = view.findViewById(R.id.tvStoriesCommentCount);
         ImageButton storylikeIB = view.findViewById(R.id.storylikeIB);
         Button commentpostbutton = view.findViewById(R.id.commentpostbutton);
@@ -100,15 +101,16 @@ public class StoriesViewPageAdapter extends PagerAdapter implements View.OnTouch
         Glide.with(mContext).load(stories.getStory_image()).into(storyIV);
         tvStoriesTime.setReferenceTime(stories.getTimestamp());
         storybottomCV.setBackgroundResource(R.drawable.blacktotransparent2);
+        tvStoryBody.setText(stories.getBody());
 
         mDatabase.child("stories").child(stories.getUser_id()).child(stories.getStory_id()).child("likes").child(user_id).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    userHasLiked = true;
+                    stories.setUserHasLiked(true);
                     storylikeIB.setBackgroundResource(R.mipmap.white_hearted);
                 } else {
-                    userHasLiked = false;
+                    stories.setUserHasLiked(false);
                     storylikeIB.setBackgroundResource(R.mipmap.white_heart);
                 }
             }
@@ -122,20 +124,35 @@ public class StoriesViewPageAdapter extends PagerAdapter implements View.OnTouch
         storylikeIB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                if (userHasLiked == false) {
+                String storyLikedNotificationId = mDatabase.child("notifications").push().getKey();
+                if (!stories.isUserHasLiked()) {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
                     String formattedDate = sdf.format(new Date());
                     HashMap<String, Object> mStoryLikeDataMap = new HashMap<>();
                     mStoryLikeDataMap.put("user_id", user_id);
                     mStoryLikeDataMap.put("timestamp", System.currentTimeMillis());
                     mStoryLikeDataMap.put("formatted_date", formattedDate);
-                    mStoryLikeDataMap.put("stoy_id", stories.getStory_id());
+                    mStoryLikeDataMap.put("story_id", stories.getStory_id());
                     mStoryLikeDataMap.put("story_user_id", stories.getUser_id());
                     mDatabase.child("stories").child(stories.getUser_id()).child(stories.getStory_id()).child("likes").child(user_id).setValue(mStoryLikeDataMap);
+
+                    String notification_id = mDatabase.child("notifications").push().getKey();
+                    HashMap<String, Object> mStoryLikedNotificationDataMap = new HashMap<>();
+                    mStoryLikedNotificationDataMap.put("from_user_id", user_id);
+                    mStoryLikedNotificationDataMap.put("to_user_id", stories.getUser_id());
+                    mStoryLikedNotificationDataMap.put("timestamp", System.currentTimeMillis());
+                    mStoryLikedNotificationDataMap.put("story_id", stories.getStory_id());
+                    mStoryLikedNotificationDataMap.put("notification_type", "story_liked_notification");
+                    mStoryLikedNotificationDataMap.put("hasUserRead", false);
+                    mStoryLikedNotificationDataMap.put("notification_id", notification_id);
+                    mDatabase.child("notifications").child(notification_id).setValue(mStoryLikedNotificationDataMap);
+
                     storylikeIB.setBackgroundResource(R.mipmap.white_hearted);
-                } else if (userHasLiked == true) {
+                } else if (stories.isUserHasLiked()) {
                     mDatabase.child("stories").child(stories.getUser_id()).child(stories.getStory_id()).child("likes").child(user_id).removeValue();
+
+
+                    mDatabase.child("notifications").child(stories.getStory_id()).removeValue();
                     storylikeIB.setBackgroundResource(R.mipmap.white_heart);
                 }
             }
@@ -182,6 +199,18 @@ public class StoriesViewPageAdapter extends PagerAdapter implements View.OnTouch
                     mCommentDataMap.put("story_user_id", stories.getUser_id());
                     mCommentDataMap.put("comment_id", comment_id);
                     mDatabase.child("stories").child(stories.getUser_id()).child(stories.getStory_id()).child("comments").child(comment_id).setValue(mCommentDataMap);
+
+                    String notification_id = mDatabase.child("notifications").push().getKey();
+                    HashMap<String, Object> mStoryLikedNotificationDataMap = new HashMap<>();
+                    mStoryLikedNotificationDataMap.put("from_user_id", user_id);
+                    mStoryLikedNotificationDataMap.put("to_user_id", stories.getUser_id());
+                    mStoryLikedNotificationDataMap.put("timestamp", System.currentTimeMillis());
+                    mStoryLikedNotificationDataMap.put("story_id", stories.getStory_id());
+                    mStoryLikedNotificationDataMap.put("notification_type", "story_comment_notification");
+                    mStoryLikedNotificationDataMap.put("story_comment_id", comment_id);
+                    mStoryLikedNotificationDataMap.put("hasUserRead", false);
+                    mStoryLikedNotificationDataMap.put("notification_id", notification_id);
+                    mDatabase.child("notifications").child(notification_id).setValue(mStoryLikedNotificationDataMap);
                 }
             }
         });

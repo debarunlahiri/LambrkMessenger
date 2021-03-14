@@ -93,7 +93,7 @@ public class StoriesActivity extends AppCompatActivity implements View.OnTouchLi
 
         storiestopCV.setBackgroundResource(R.drawable.black_to_transparent);
 
-        mDatabase.child("users").child(story_user_id).child("user_data").addValueEventListener(new ValueEventListener() {
+        mDatabase.child("users").child(story_user_id).child("user_data").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String name = dataSnapshot.child("name").getValue().toString();

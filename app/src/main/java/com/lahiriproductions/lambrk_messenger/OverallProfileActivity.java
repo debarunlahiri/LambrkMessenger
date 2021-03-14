@@ -330,11 +330,12 @@ public class OverallProfileActivity extends AppCompatActivity {
                                         overallprofilefollbutton.setText("Following");
                                         overallprofilemessagebutton.setVisibility(View.VISIBLE);
                                         HashMap<String, Object> mNotificationDataMap = new HashMap<>();
-                                        mNotificationDataMap.put("user_id", user_id);
-                                        mNotificationDataMap.put("searched_user_id", searched_user_id);
+                                        mNotificationDataMap.put("to_user_id", searched_user_id);
+                                        mNotificationDataMap.put("from_user_id", user_id);
                                         mNotificationDataMap.put("timestamp", System.currentTimeMillis());
                                         mNotificationDataMap.put("hasUserRead", false);
-                                        mDatabase.child("notifications").child("following").child(searched_user_id).child(user_id).setValue(mNotificationDataMap);
+                                        mNotificationDataMap.put("notification_type", "following_notification");
+                                        mDatabase.child("notifications").child(searched_user_id).setValue(mNotificationDataMap);
                                     }
 
 

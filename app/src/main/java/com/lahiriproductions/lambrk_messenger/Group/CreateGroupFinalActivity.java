@@ -3,6 +3,7 @@ package com.lahiriproductions.lambrk_messenger.Group;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,7 +30,11 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.Random;
 
 import id.zelory.compressor.Compressor;
 
@@ -161,6 +166,26 @@ public class CreateGroupFinalActivity extends AppCompatActivity {
                                                             public void onComplete(@NonNull Task<Void> task) {
                                                                 if (task.isSuccessful()) {
                                                                     Toast.makeText(getApplicationContext(), "Group created suucessfully", Toast.LENGTH_LONG).show();
+                                                                    Random rnd = new Random();
+                                                                    int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+                                                                    String formattedDate = sdf.format(new Date());
+                                                                    HashMap<String, Object> mGroupJoinDataMap = new HashMap<>();
+                                                                    mGroupJoinDataMap.put("user_id", user_id);
+                                                                    mGroupJoinDataMap.put("timestamp", System.currentTimeMillis());
+                                                                    mGroupJoinDataMap.put("formatted_date", formattedDate);
+                                                                    mGroupJoinDataMap.put("chat_color_code", String.valueOf(color));
+                                                                    mGroupJoinDataMap.put("isAdmin", true);
+                                                                    mDatabase.child("groups").child(group_id).child("members").child(user_id).setValue(mGroupJoinDataMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                        @Override
+                                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                                            if (task.isSuccessful()) {
+                                                                                mDatabase.child("group_members").child(user_id).child(group_id).child(group_id).setValue(group_id);
+                                                                            } else {
+                                                                                Toast.makeText(CreateGroupFinalActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                                                            }
+                                                                        }
+                                                                    });
                                                                     tvCreateGroupFinal.setText("Redirecting...");
                                                                     new Handler().postDelayed(new Runnable() {
                                                                         @Override

@@ -23,6 +23,8 @@ import androidx.fragment.app.FragmentManager;
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.lahiriproductions.lambrk_messenger.Explore.ExploreFragment;
 import com.lahiriproductions.lambrk_messenger.Group.GroupFragment;
 import com.lahiriproductions.lambrk_messenger.Inbox.InboxFragment;
@@ -40,6 +42,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.lahiriproductions.lambrk_messenger.Utils.Variables;
 
 
 import java.util.HashMap;
@@ -90,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
             sendToLogin();
         } else {
             user_id = currentUser.getUid();
-            mDatabase.child("users").child(user_id).child("user_id").addValueEventListener(new ValueEventListener() {
+            mDatabase.child("users").child(user_id).child("user_id").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (!dataSnapshot.exists()) {
@@ -131,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                             finish();
 //                            Toast.makeText(getApplicationContext(), "Please select your gender", Toast.LENGTH_LONG).show();
                         } else {
-                            mDatabase.child("users").child(user_id).child("privacy").addValueEventListener(new ValueEventListener() {
+                            mDatabase.child("users").child(user_id).child("privacy").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     if (!dataSnapshot.exists()) {
@@ -167,6 +170,16 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
+
+            FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                @Override
+                public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                    if (task.isSuccessful()) {
+                        Variables.token_id = task.getResult().getToken();
+                        mDatabase.child("users").child(user_id).child("token_id").setValue(Variables.token_id);
+                    }
+                }
+            });
         }
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -183,11 +196,11 @@ public class MainActivity extends AppCompatActivity {
         // Create items
         AHBottomNavigationItem item1 = new AHBottomNavigationItem("Home", R.drawable.home, R.color.md_black_1000);
         AHBottomNavigationItem item2 = new AHBottomNavigationItem("Group", R.drawable.group, R.color.md_black_1000);
-//        AHBottomNavigationItem item3 = new AHBottomNavigationItem("Explore", R.drawable.ic_explore_black_24dp, R.color.md_black_1000);
+        AHBottomNavigationItem item3 = new AHBottomNavigationItem("Explore", R.drawable.ic_explore_black_24dp, R.color.md_black_1000);
         // Add items
         bottomNavigation.addItem(item1);
         bottomNavigation.addItem(item2);
-//        bottomNavigation.addItem(item3);
+        bottomNavigation.addItem(item3);
 
         // Set background color
         bottomNavigation.setDefaultBackgroundColor(Color.WHITE);
@@ -228,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
 
         fragmentManager.beginTransaction().add(R.id.main_frame, inboxFragment, "1").commit();
         fragmentManager.beginTransaction().add(R.id.main_frame, groupFragment, "2").hide(groupFragment).commit();
-//        fragmentManager.beginTransaction().add(R.id.main_frame, exploreFragment, "3").hide(exploreFragment).commit();
+        fragmentManager.beginTransaction().add(R.id.main_frame, exploreFragment, "3").hide(exploreFragment).commit();
 
         String notificationIntent = getIntent().getStringExtra("messageNotification");
 
@@ -256,10 +269,10 @@ public class MainActivity extends AppCompatActivity {
                         active[0] = groupFragment;
                         return true;
 
-//                    case 2:
-//                        fragmentManager.beginTransaction().hide(active[0]).show(exploreFragment).commit();
-//                        active[0] = exploreFragment;
-//                        return true;
+                    case 2:
+                        fragmentManager.beginTransaction().hide(active[0]).show(exploreFragment).commit();
+                        active[0] = exploreFragment;
+                        return true;
 
                     default:
                         return false;

@@ -98,7 +98,7 @@ public class GroupActivity extends AppCompatActivity {
     private StorageReference storageReference;
 
     private String group_id;
-    private String group_cover_image, group_profile_image, group_name, group_desc;
+    private String group_cover_image, group_profile_image, group_name, group_desc, group_admin_user_id;
     private String user_id;
     private String profile_image;
 
@@ -396,14 +396,16 @@ public class GroupActivity extends AppCompatActivity {
     }
 
     private void fetchPosts() {
-        mDatabase.child("groups").child(group_id).child("posts").addChildEventListener(new ChildEventListener() {
+        mDatabase.child("group_posts").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 if (dataSnapshot.exists()) {
                     tvGroupShowMessage.setVisibility(View.GONE);
                     GroupPosts groupPosts = dataSnapshot.getValue(GroupPosts.class);
-                    groupPostsList.add(groupPosts);
-                    groupPostsAdapter.notifyDataSetChanged();
+                    if (groupPosts.getGroup_id().equals(group_id)) {
+                        groupPostsList.add(groupPosts);
+                        groupPostsAdapter.notifyDataSetChanged();
+                    }
                 } else {
                     tvGroupShowMessage.setVisibility(View.VISIBLE);
                 }
@@ -486,7 +488,7 @@ public class GroupActivity extends AppCompatActivity {
                                     mPostDataMap.put("timestamp", System.currentTimeMillis());
                                     mPostDataMap.put("user_id", user_id);
                                     mPostDataMap.put("post_image", downloadUri.toString());
-                                    mDatabase.child("groups").child(group_id).child("posts").child(post_id).setValue(mPostDataMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    mDatabase.child("group_posts").child(post_id).setValue(mPostDataMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()) {
@@ -534,7 +536,7 @@ public class GroupActivity extends AppCompatActivity {
         mPostDataMap.put("formatted_date", formattedDate);
         mPostDataMap.put("timestamp", System.currentTimeMillis());
         mPostDataMap.put("user_id", user_id);
-        mDatabase.child("groups").child(group_id).child("posts").child(post_id).setValue(mPostDataMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+        mDatabase.child("group_posts").child(post_id).setValue(mPostDataMap).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
@@ -575,6 +577,7 @@ public class GroupActivity extends AppCompatActivity {
                 group_name = dataSnapshot.child("group_name").getValue().toString();
                 group_profile_image = dataSnapshot.child("group_profile_image").getValue().toString();
                 group_desc = dataSnapshot.child("group_desc").getValue().toString();
+                group_admin_user_id = dataSnapshot.child("group_admin_user_id").getValue().toString();
                 Glide.with(getApplicationContext()).load(group_cover_image).into(groupCoverIV);
                 Glide.with(getApplicationContext()).load(group_profile_image).into(groupProfileCIV);
                 tvGroupName.setText(group_name);
@@ -583,6 +586,10 @@ public class GroupActivity extends AppCompatActivity {
 
                 groupPB.setVisibility(View.GONE);
                 groupNSW.setVisibility(View.VISIBLE);
+
+                if (group_admin_user_id.equals(user_id)) {
+                    groupjoinbutton.setVisibility(View.GONE);
+                }
             }
 
             @Override

@@ -47,7 +47,6 @@ public class GroupPostsAdapter extends RecyclerView.Adapter<GroupPostsAdapter.Vi
 
     private String user_id;
 
-    private boolean userHasliked = false;
 
     public static final int GROUP_POST_TYPE_TEXT = 0;
     public static final int GROUP_POST_TYPE_IMAGE = 1;
@@ -134,11 +133,11 @@ public class GroupPostsAdapter extends RecyclerView.Adapter<GroupPostsAdapter.Vi
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    userHasliked = true;
+                    groupPosts.setUserHasliked(true);
                     holder.grouppostLikeIB.setBackgroundResource(R.mipmap.hearted);
                     holder.grouppostLikeIB.setColorFilter(Color.rgb(251, 57, 88));
                 } else {
-                    userHasliked = false;
+                    groupPosts.setUserHasliked(false);
                     holder.grouppostLikeIB.setBackgroundResource(R.mipmap.heart);
                     holder.grouppostLikeIB.setColorFilter(Color.BLACK);
                 }
@@ -152,7 +151,7 @@ public class GroupPostsAdapter extends RecyclerView.Adapter<GroupPostsAdapter.Vi
         holder.grouppostLikeIB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (userHasliked == false) {
+                if (!groupPosts.isUserHasliked()) {
                     HashMap<String, Object> mGroupPostLikeDataMap = new HashMap<>();
                     mGroupPostLikeDataMap.put("user_id", user_id);
                     mGroupPostLikeDataMap.put("group_id", groupPosts.getGroup_id());
@@ -162,7 +161,7 @@ public class GroupPostsAdapter extends RecyclerView.Adapter<GroupPostsAdapter.Vi
                     holder.grouppostLikeIB.setBackgroundResource(R.mipmap.hearted);
                     holder.grouppostLikeIB.setColorFilter(Color.rgb(251, 57, 88));
                     holder.grouppostLikeIB.setColorFilter(Color.BLACK);
-                } else if (userHasliked == true) {
+                } else if (groupPosts.isUserHasliked()) {
                     mDatabase.child("groups").child(groupPosts.getGroup_id()).child("posts").child(groupPosts.getPost_id()).child("likes").child(user_id).removeValue();
                     holder.grouppostLikeIB.setBackgroundResource(R.mipmap.heart);
                     holder.grouppostLikeIB.setColorFilter(Color.BLACK);

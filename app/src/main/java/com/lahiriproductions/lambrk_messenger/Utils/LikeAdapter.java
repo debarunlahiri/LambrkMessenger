@@ -120,6 +120,12 @@ public class LikeAdapter extends RecyclerView.Adapter<LikeAdapter.ViewHolder> {
                     }
                 }
             });
+
+            if (like.getIsAdmin()) {
+                holder.tvAdmin.setVisibility(View.VISIBLE);
+            } else {
+                holder.tvAdmin.setVisibility(View.GONE);
+            }
         }
 
         holder.likeCV.setOnClickListener(new View.OnClickListener() {
@@ -184,7 +190,7 @@ public class LikeAdapter extends RecyclerView.Adapter<LikeAdapter.ViewHolder> {
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private CardView likeCV;
-        private TextView tvLikeName, tvLikeUsername;
+        private TextView tvLikeName, tvLikeUsername, tvAdmin;
         private Button likefollowbutton;
         private CircleImageView likeprofileCIV;
 
@@ -196,6 +202,7 @@ public class LikeAdapter extends RecyclerView.Adapter<LikeAdapter.ViewHolder> {
             tvLikeUsername = itemView.findViewById(R.id.tvLikeUsername);
             likefollowbutton = itemView.findViewById(R.id.likefollowbutton);
             likeprofileCIV = itemView.findViewById(R.id.likeprofileCIV);
+            tvAdmin = itemView.findViewById(R.id.tvAdmin);
         }
     }
 }
