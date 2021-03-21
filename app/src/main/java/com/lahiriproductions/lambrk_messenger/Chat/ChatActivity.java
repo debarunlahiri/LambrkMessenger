@@ -1,16 +1,26 @@
 package com.lahiriproductions.lambrk_messenger.Chat;
 
+import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,10 +29,21 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.Continuation;
+import com.google.firebase.storage.UploadTask;
+import com.google.gson.Gson;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
+import com.lahiriproductions.lambrk_messenger.AddStoryActivity;
 import com.lahiriproductions.lambrk_messenger.OverallProfileActivity;
 import com.lahiriproductions.lambrk_messenger.R;
 import com.github.curioustechizen.ago.RelativeTimeTextView;
@@ -39,7 +60,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.lahiriproductions.lambrk_messenger.Utils.FileUtil;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -50,17 +77,21 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import id.zelory.compressor.Compressor;
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends AppCompatActivity implements ChatMultipleImagesUploadAdapter.OnItemClickListener {
 
+    private static final int PICK_IMAGE = 143;
+    private static final String TAG = ChatActivity.class.getSimpleName();
     private EditText etChat;
     private Button chatsendbutton;
     private CircleImageView chatuserprofileCIV;
     private TextView tvChatUserName, tvReplyUsername, tvReplyMessage, tvChatUserIndicator1;
     private RelativeTimeTextView tvChatUserIndicator;
     private CardView chatheadprofileCV;
-    private ImageButton chatbackIB, replymessagecloseIB;
-    private CardView messaggereplyCV;
+    private ImageButton chatbackIB, replymessagecloseIB, ibChatAddMedia;
+    private CardView messaggereplyCV, cvChatAddMedia;
+    private ProgressBar pbMultipleMediaUpload;
 
     private DatabaseReference mDatabase;
     private FirebaseUser currentUser;
@@ -68,12 +99,18 @@ public class ChatActivity extends AppCompatActivity {
     private FirebaseStorage mStorage;
     private StorageReference storageReference;
 
-    private RecyclerView chatRV;
+    private RecyclerView chatRV, rvChatAddMedia, rvChatUploadImages;
     private ChatAdapter chatAdapter;
+    private ChatAddMediaAdapter chatAddMediaAdapter;
+    private ChatMultipleImagesUploadAdapter chatMultipleImagesUploadAdapter;
     private Context mContext;
     private LinearLayoutManager linearLayoutManager;
     private List<Chat> chatList = new ArrayList<>();
+    private List<ChatAddMedia> chatAddMediaList = new ArrayList<>();
+    private List<ChatMultipleImagesUpload> chatMultipleImagesUploadList = new ArrayList<>();
     private List<String> mKeys = new ArrayList<>();
+    ArrayList<Uri> mArrayUri = new ArrayList<Uri>();
+    ArrayList<Boolean> progressImageUpload = new ArrayList<Boolean>();
 
     private String searched_user_id;
     private String user_id;
@@ -87,7 +124,9 @@ public class ChatActivity extends AppCompatActivity {
     private Timer timer = new Timer();
     private final long DELAY = 400; // milliseconds
     boolean isTyping = false;
-
+    private Bitmap mCompressedStoryImage;
+    String imageEncoded;
+    List<String> imagesEncodedList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +150,9 @@ public class ChatActivity extends AppCompatActivity {
         tvReplyMessage = findViewById(R.id.tvReplyMessage);
         replymessagecloseIB = findViewById(R.id.replymessagecloseIB);
         tvChatUserIndicator1 = findViewById(R.id.tvChatUserIndicator1);
+        ibChatAddMedia = findViewById(R.id.ibChatAddMedia);
+        cvChatAddMedia = findViewById(R.id.cvChatAddMedia);
+        pbMultipleMediaUpload = findViewById(R.id.pbMultipleMediaUpload);
 
         chatRV = findViewById(R.id.chatRV);
         chatAdapter = new ChatAdapter(chatList, mContext);
@@ -119,6 +161,18 @@ public class ChatActivity extends AppCompatActivity {
         chatRV.setAdapter(chatAdapter);
         //linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);
+
+        rvChatAddMedia = findViewById(R.id.rvChatAddMedia);
+        rvChatUploadImages = findViewById(R.id.rvChatUploadImages);
+        chatAddMediaAdapter = new ChatAddMediaAdapter(mContext, chatAddMediaList);
+        chatMultipleImagesUploadAdapter = new ChatMultipleImagesUploadAdapter(mContext, mArrayUri, this);
+        rvChatAddMedia.setAdapter(chatAddMediaAdapter);
+        rvChatUploadImages.setAdapter(chatMultipleImagesUploadAdapter);
+        rvChatUploadImages.setLayoutManager(new LinearLayoutManager(mContext, RecyclerView.HORIZONTAL, false));
+        rvChatAddMedia.setLayoutManager(new GridLayoutManager(mContext, 1));
+
+        rvChatUploadImages.setVisibility(View.GONE);
+        pbMultipleMediaUpload.setVisibility(View.GONE);
 
         mDatabase = FirebaseDatabase.getInstance(getString(R.string.firebase_url)).getReference();;
         mAuth = FirebaseAuth.getInstance();
@@ -145,12 +199,14 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String message = etChat.getText().toString();
-                if (message.isEmpty()) {
+                if (message.isEmpty() && mArrayUri.size() == 0) {
                     Toast.makeText(mContext, "Cannot send empty message", Toast.LENGTH_LONG).show();
                 } else {
                     etChat.setText("");
-                    if (reply_chat_id == null) {
+                    if (reply_chat_id == null && mArrayUri.size() == 0) {
                         sendMessage(message);
+                    } else if (mArrayUri.size() > 0) {
+                        sendUploadMessage(message);
                     } else {
                         replyMessage(message);
                     }
@@ -209,7 +265,182 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+        cvChatAddMedia.setVisibility(View.GONE);
+        ibChatAddMedia.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                if (cvChatAddMedia.getVisibility() == View.VISIBLE) {
+//                    cvChatAddMedia.setVisibility(View.GONE);
+//                } else {
+//                    cvChatAddMedia.setVisibility(View.VISIBLE);
+//                }
+                Dexter.withActivity(ChatActivity.this)
+                        .withPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                        .withListener(new PermissionListener() {
+                            @Override
+                            public void onPermissionGranted(PermissionGrantedResponse response) {
+                                Intent intent = new Intent();
+                                intent.setType("image/*");
+                                intent.setAction(Intent.ACTION_GET_CONTENT);
+                                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+                            }
 
+                            @Override
+                            public void onPermissionDenied(PermissionDeniedResponse response) {
+                                Toast.makeText(getApplicationContext(), response.toString(), Toast.LENGTH_LONG).show();
+
+                            }
+
+                            @Override
+                            public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+                                token.continuePermissionRequest();
+                            }
+                        })
+                        .check();
+
+            }
+        });
+
+        initChatAddMedia();
+    }
+
+    private void sendUploadMessage(String message) {
+        Toast.makeText(getApplicationContext(), "Uploading Images", Toast.LENGTH_LONG).show();
+        pbMultipleMediaUpload.setVisibility(View.VISIBLE);
+        if (mArrayUri.size() > 0) {
+            rvChatUploadImages.setVisibility(View.GONE);
+        }
+        for (int i=0; i<mArrayUri.size(); i++) {
+            try {
+                uploadImage(mArrayUri.get(i), i, message);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (progressImageUpload.equals(true)) {
+            if (!message.isEmpty()) {
+                sendMessage(message);
+            }
+        }
+    }
+
+    private void uploadImage(Uri postImageUri, int position, String message) throws IOException {
+        if (postImageUri == null) {
+            Toast.makeText(getApplicationContext(), "Select an image", Toast.LENGTH_LONG).show();
+        } else {
+//            ProgressDialog progressDialog = new ProgressDialog(this);
+//            progressDialog.setMessage("Uploading images...");
+//            progressDialog.show();
+            File mFileGroupProfileImage = FileUtil.from(ChatActivity.this, postImageUri);
+            String chat_id = mDatabase.child("chats").push().getKey();
+            final Long ts_long = System.currentTimeMillis() / 1000;
+            final String ts = ts_long.toString();
+            //final StorageReference childRef = storageReference.child("users/profiles/profile_images/" + currentUser.getUid() + ".jpg");
+            //final StorageReference thumb_childRef = storageReference.child("users/profile_images/profile_images/" + currentUser.getUid() + ".jpg");
+
+            mCompressedStoryImage = new Compressor(ChatActivity.this).setQuality(8).compressToBitmap(mFileGroupProfileImage);
+
+
+            ByteArrayOutputStream mProfileBAOS = new ByteArrayOutputStream();
+            mCompressedStoryImage.compress(Bitmap.CompressFormat.JPEG, 25, mProfileBAOS);
+            byte[] mProfileThumbData = mProfileBAOS.toByteArray();
+
+            final StorageReference mThumbChildRefProfile = storageReference.child("chats/images/" + chat_id + "/" + ts + ".jpg");
+
+            final UploadTask profile_thumb_uploadTask = mThumbChildRefProfile.putBytes(mProfileThumbData);
+
+            profile_thumb_uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        Task<Uri> thumb_uriTask = profile_thumb_uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                            @Override
+                            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                                if (!task.isSuccessful()) {
+                                    throw task.getException();
+                                }
+                                return mThumbChildRefProfile.getDownloadUrl();
+                            }
+                        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Uri> task) {
+                                if (task.isSuccessful()) {
+                                    Uri profile_thumb_downloadUri = task.getResult();
+                                    if (task.isSuccessful()) {
+                                        Uri downloadUri = task.getResult();
+                                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+                                        String formattedDate = sdf.format(new Date());
+                                        HashMap<String, Object> mChatDataMap = new HashMap<>();
+//                                        mChatDataMap.put("message", message.trim());
+                                        mChatDataMap.put("sender_user_id", user_id);
+                                        mChatDataMap.put("receiver_user_id", searched_user_id);
+                                        mChatDataMap.put("timestamp", System.currentTimeMillis());
+                                        mChatDataMap.put("has_seen", isOnline);
+                                        mChatDataMap.put("formatted_date", formattedDate);
+                                        mChatDataMap.put("chat_id", chat_id);
+                                        mChatDataMap.put("media_type", "image");
+                                        mChatDataMap.put("media", downloadUri.toString());
+                                        mDatabase.child("chats").child(user_id).child(searched_user_id).child(chat_id).setValue(mChatDataMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    if (isOnline == false) {
+                                                        mDatabase.child("notifications").child(searched_user_id).child(user_id).child(chat_id).setValue(mChatDataMap);
+                                                    }
+                                                    mDatabase.child("chats").child(searched_user_id).child(user_id).child(chat_id).setValue(mChatDataMap);
+//                                                    mDatabase.child("last_message").child(user_id).child(searched_user_id).child(chat_id).setValue(mChatDataMap);
+//                                                    mDatabase.child("last_message").child(searched_user_id).child(user_id).child(chat_id).setValue(mChatDataMap);
+                                                    progressImageUpload.add(true);
+                                                    if (position == mArrayUri.size()-1) {
+                                                        mArrayUri.clear();
+                                                        pbMultipleMediaUpload.setVisibility(View.GONE);
+                                                        if (!message.isEmpty()) {
+                                                            sendMessage(message);
+                                                        }
+                                                    }
+//                                                    progressDialog.dismiss();
+                                                } else {
+                                                    Toast.makeText(mContext, "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                                    if (position == mArrayUri.size()-1) {
+                                                        pbMultipleMediaUpload.setVisibility(View.GONE);
+                                                    }
+//                                                    progressDialog.dismiss();
+                                                }
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast.makeText(mContext, "Failure: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                                progressImageUpload.add(false);
+                                                if (position == mArrayUri.size()-1) {
+                                                    pbMultipleMediaUpload.setVisibility(View.GONE);
+                                                }
+                                            }
+                                        });
+                                    } else {
+                                        // Handle failures
+                                        // ...
+//                                        progressDialog.dismiss();
+                                        String errMsg = task.getException().getMessage();
+                                        Toast.makeText(getApplicationContext(), "Download Uri Error: " + errMsg, Toast.LENGTH_LONG).show();
+                                        if (position == mArrayUri.size()-1) {
+                                            pbMultipleMediaUpload.setVisibility(View.GONE);
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                }
+            });
+        }
+    }
+
+    private void initChatAddMedia() {
+        ChatAddMedia chatAddMedia = new ChatAddMedia("Add Image", R.drawable.add_icon);
+        chatAddMediaList.add(chatAddMedia);
     }
 
 
@@ -293,8 +524,8 @@ public class ChatActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
                         mDatabase.child("chats").child(searched_user_id).child(user_id).child(chat_id).setValue(mReplyMessageDataMap);
-                        mDatabase.child("last_message").child(user_id).child(searched_user_id).child(chat_id).setValue(mReplyMessageDataMap);
-                        mDatabase.child("last_message").child(searched_user_id).child(user_id).child(chat_id).setValue(mReplyMessageDataMap);
+//                        mDatabase.child("last_message").child(user_id).child(searched_user_id).child(chat_id).setValue(mReplyMessageDataMap);
+//                        mDatabase.child("last_message").child(searched_user_id).child(user_id).child(chat_id).setValue(mReplyMessageDataMap);
                         messaggereplyCV.setVisibility(View.GONE);
                         reply_chat_id = null;
                     } else {
@@ -375,9 +606,21 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 Chat chat = dataSnapshot.getValue(Chat.class);
+//                String key = dataSnapshot.getKey();
+//                int index = mKeys.indexOf(key);
+//                chatList.set(index, chat);
+//                chatAdapter.notifyDataSetChanged();
+
                 String key = dataSnapshot.getKey();
-                int index = mKeys.indexOf(key);
-                chatList.set(index, chat);
+
+                for (int i = 0; i < chatList.size(); i++) {
+                    // Find the item to remove and then remove it by index
+                    if (chatList.get(i).getChat_id().equals(key)) {
+                        chatList.set(i, chat);
+                        break;
+                    }
+                }
+
                 chatAdapter.notifyDataSetChanged();
             }
 
@@ -490,11 +733,11 @@ public class ChatActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
                     if (isOnline == false) {
-                        mDatabase.child("notifications").child("chats").child(searched_user_id).child(user_id).child(chat_id).setValue(mChatDataMap);
+                        mDatabase.child("notifications").child(searched_user_id).child(user_id).child(chat_id).setValue(mChatDataMap);
                     }
                     mDatabase.child("chats").child(searched_user_id).child(user_id).child(chat_id).setValue(mChatDataMap);
-                    mDatabase.child("last_message").child(user_id).child(searched_user_id).child(chat_id).setValue(mChatDataMap);
-                    mDatabase.child("last_message").child(searched_user_id).child(user_id).child(chat_id).setValue(mChatDataMap);
+//                    mDatabase.child("last_message").child(user_id).child(searched_user_id).child(chat_id).setValue(mChatDataMap);
+//                    mDatabase.child("last_message").child(searched_user_id).child(user_id).child(chat_id).setValue(mChatDataMap);
                 } else {
                     Toast.makeText(mContext, "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                 }
@@ -505,6 +748,74 @@ public class ChatActivity extends AppCompatActivity {
                 Toast.makeText(mContext, "Failure: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        try {
+            // When an Image is picked
+            if (requestCode == PICK_IMAGE && resultCode == RESULT_OK
+                    && null != data) {
+                // Get the Image from data
+
+                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+                imagesEncodedList = new ArrayList<String>();
+                if(data.getData()!=null){
+
+                    Uri mImageUri=data.getData();
+
+                    // Get the cursor
+                    Cursor cursor = getContentResolver().query(mImageUri,
+                            filePathColumn, null, null, null);
+                    // Move to first row
+                    cursor.moveToFirst();
+
+                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                    imageEncoded  = cursor.getString(columnIndex);
+                    cursor.close();
+                    mArrayUri.add(mImageUri);
+                    rvChatUploadImages.setVisibility(View.VISIBLE);
+                    chatMultipleImagesUploadAdapter.setChatMultipleImagesUploadList(mArrayUri);
+                    Log.v(TAG, "Selected Images" + mArrayUri.size());
+                    Log.e(TAG, "onActivityResult: Multiple Selected Images:\n" + new Gson().toJson(imagesEncodedList));
+                } else {
+                    if (data.getClipData() != null) {
+                        ClipData mClipData = data.getClipData();
+//                        ArrayList<Uri> mArrayUri = new ArrayList<Uri>();
+                        ChatMultipleImagesUpload chatMultipleImagesUpload = new ChatMultipleImagesUpload();
+                        for (int i = 0; i < mClipData.getItemCount(); i++) {
+
+                            ClipData.Item item = mClipData.getItemAt(i);
+                            Uri uri = item.getUri();
+                            mArrayUri.add(uri);
+                            // Get the cursor
+                            Cursor cursor = getContentResolver().query(uri, filePathColumn, null, null, null);
+                            // Move to first row
+                            cursor.moveToFirst();
+
+                            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                            imageEncoded  = cursor.getString(columnIndex);
+                            imagesEncodedList.add(imageEncoded);
+                            cursor.close();
+
+                        }
+                        rvChatUploadImages.setVisibility(View.VISIBLE);
+                        chatMultipleImagesUploadAdapter.setChatMultipleImagesUploadList(mArrayUri);
+                        Log.v(TAG, "Selected Images" + mArrayUri.size());
+                        Log.e(TAG, "onActivityResult: Multiple Selected Images:\n" + new Gson().toJson(imagesEncodedList));
+                    }
+                }
+            } else {
+                Toast.makeText(this, "You haven't picked Image",
+                        Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "onActivityResult: " + e.getLocalizedMessage());
+            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
+                    .show();
+        }
     }
 
     @Override
@@ -557,5 +868,14 @@ public class ChatActivity extends AppCompatActivity {
         mActiveDataMap.put("formatted_date", formattedDate);
         mDatabase.child("active").child(user_id).setValue(mActiveDataMap);
         super.onStart();
+    }
+
+    @Override
+    public void onItemClick(Uri uri, int position, List<Uri> chatMultipleImagesUploadList) {
+        mArrayUri.remove(position);
+        chatMultipleImagesUploadAdapter.setChatMultipleImagesUploadList(mArrayUri);
+        if (chatMultipleImagesUploadList.size() == 0) {
+            rvChatUploadImages.setVisibility(View.GONE);
+        }
     }
 }

@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -25,7 +26,7 @@ import androidx.cardview.widget.CardView;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.lahiriproductions.lambrk_messenger.R;
+import com.bumptech.glide.Glide;
 import com.github.curioustechizen.ago.RelativeTimeTextView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -39,33 +40,61 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.lahiriproductions.lambrk_messenger.R;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
+    public static final int MESSAGE_RIGHT = 1;
+    public static final int MESSAGE_LEFT = 2;
+    public static final int MESSAGE_REPLY_RIGHT = 3;
+    public static final int MESSAGE_REPLY_LEFT = 4;
+    private static final int MESSAGE_MEDIA_RIGHT = 5;
+    private static final int MESSAGE_MEDIA_LEFT = 6;
     private List<Chat> chatList;
     private Context mContext;
-
     private DatabaseReference mDatabase;
     private FirebaseUser currentUser;
     private FirebaseAuth mAuth;
     private FirebaseStorage mStorage;
     private StorageReference storageReference;
-
     private String user_id;
     private String message;
+    private boolean isImageUpload = false;
 
-    public static final int MESSAGE_RIGHT = 1;
-    public static final int MESSAGE_LEFT = 2;
-    public static final int MESSAGE_REPLY_RIGHT = 3;
-    public static final int MESSAGE_REPLY_LEFT = 4;
 
     public ChatAdapter(List<Chat> chatList, Context mContext) {
         this.chatList = chatList;
         this.mContext = mContext;
+    }
+
+    public static void setForceShowIcon(PopupMenu popupMenu) {
+        try {
+            Field[] fields = popupMenu.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                if ("mPopup".equals(field.getName())) {
+                    field.setAccessible(true);
+                    Object menuPopupHelper = field.get(popupMenu);
+                    Class<?> classPopupHelper = Class.forName(menuPopupHelper
+                            .getClass().getName());
+                    Method setForceIcons = classPopupHelper.getMethod(
+                            "setForceShowIcon", boolean.class);
+                    setForceIcons.invoke(menuPopupHelper, true);
+                    break;
+                }
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setChatUpload(boolean isImageUpload) {
+        this.isImageUpload = isImageUpload;
     }
 
     @NonNull
@@ -80,6 +109,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         } else if (viewType == MESSAGE_REPLY_LEFT) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.receiver_chat_reply_list_item, parent, false);
             return new ViewHolder(view);
+        } else if (viewType == MESSAGE_MEDIA_LEFT) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list_chat_media_left_layout, parent, false);
+            return new ViewHolder(view);
+        } else if (viewType == MESSAGE_MEDIA_RIGHT) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list_chat_media_right_layout, parent, false);
+            return new ViewHolder(view);
         } else {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.receiver_chat_list_item, parent, false);
             return new ViewHolder(view);
@@ -92,44 +127,62 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Chat chat = chatList.get(position);
 
-        mDatabase = FirebaseDatabase.getInstance(mContext.getString(R.string.firebase_url)).getReference();;
+        mDatabase = FirebaseDatabase.getInstance(mContext.getString(R.string.firebase_url)).getReference();
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         mStorage = FirebaseStorage.getInstance();
         storageReference = mStorage.getReferenceFromUrl(mContext.getString(R.string.storage_reference_url));
 
 //        setMessage(holder, position);
-        holder.tvChatMessage.setText(chat.getMessage());
-
-        holder.tvChatMessage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                initPopupMenu(holder, position);
+        if (chat.getMedia_type() != null && chat.getMedia() != null) {
+            if (chat.getMedia_type().equalsIgnoreCase("image")) {
+                Glide.with(mContext).load(chat.getMedia()).into(holder.ivChatMediaImage);
             }
-        });
 
-        holder.tvTime.setVisibility(View.GONE);
-        if (chat.getReply_chat_id() == null) {
-            holder.tvChatMessage.setOnLongClickListener(new View.OnLongClickListener() {
+            holder.cvChatMedia.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public boolean onLongClick(View view) {
-                    initTvTime(holder, position);
-                    return true;
+                public void onClick(View view) {
+                    Intent chatMediaIntent = new Intent(mContext, ChatMediaActivity.class);
+                    chatMediaIntent.putExtra("sender_user_id", chat.getSender_user_id());
+                    chatMediaIntent.putExtra("receiver_user_id", chat.getReceiver_user_id());
+                    chatMediaIntent.putExtra("chat_id", chat.getChat_id());
+                    mContext.startActivity(chatMediaIntent);
                 }
             });
         } else {
-            holder.tvChatMessage.setOnLongClickListener(new View.OnLongClickListener() {
+            holder.tvChatMessage.setText(chat.getMessage());
+            holder.tvChatMessage.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public boolean onLongClick(View view) {
-                    initTvTime(holder, position);
-                    return true;
+                public void onClick(View view) {
+                    initPopupMenu(holder, position);
                 }
             });
+
+            holder.tvTime.setVisibility(View.GONE);
+            if (chat.getReply_chat_id() == null) {
+                holder.tvChatMessage.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        initTvTime(holder, position);
+                        return true;
+                    }
+                });
+            } else {
+                holder.tvChatMessage.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        initTvTime(holder, position);
+                        return true;
+                    }
+                });
+            }
+
+            if (chat.getReply_chat_id() != null) {
+                fetchReplyMessage(holder, position);
+            }
         }
 
-        if (chat.getReply_chat_id() != null) {
-            fetchReplyMessage(holder, position);
-        }
+
     }
 
     private void initTvTime(ViewHolder holder, int position) {
@@ -165,11 +218,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         Chat chat = chatList.get(position);
         PopupMenu popupMenu = new PopupMenu(mContext, holder.tvChatMessage);
         popupMenu.inflate(R.menu.message_menu);
-        popupMenu.getMenu().findItem(R.id.message_reply_item).setVisible(false);
+        popupMenu.getMenu().findItem(R.id.message_reply_item).setVisible(true);
         if (!chat.getSender_user_id().equals(user_id)) {
             popupMenu.getMenu().findItem(R.id.message_delete_for_everyone_item).setVisible(false);
             popupMenu.getMenu().findItem(R.id.message_edit_item).setVisible(false);
         }
+        setForceShowIcon(popupMenu);
+
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -194,8 +249,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                         mDatabase.child("chats").child(chat.getSender_user_id()).child(chat.getReceiver_user_id()).child(chat.getChat_id()).child("message").addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                String edited_message = dataSnapshot.getValue().toString();
-                                etEditChatDialogBody.setText(edited_message);
+                                if (dataSnapshot.exists()) {
+                                    String edited_message = dataSnapshot.getValue().toString();
+                                    etEditChatDialogBody.setText(edited_message);
+                                }
                             }
 
                             @Override
@@ -246,6 +303,17 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 if (chat.getReceiver_user_id().equals(user_id)) {
                                     mDatabase.child("chats").child(chat.getReceiver_user_id()).child(chat.getSender_user_id()).child(chat.getChat_id()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                Toast.makeText(mContext, "Message deleted successfully", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                Toast.makeText(mContext, "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    mDatabase.child("chats").child(chat.getSender_user_id()).child(chat.getReceiver_user_id()).child(chat.getChat_id()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()) {
@@ -317,6 +385,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             }
         });
         popupMenu.show();
+
+
     }
 
     private void fetchReplyMessage(ViewHolder holder, int position) {
@@ -400,7 +470,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         }
 
 
-
     }
 
     @Override
@@ -411,7 +480,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     @Override
     public int getItemViewType(int position) {
         Chat chat = chatList.get(position);
-        mDatabase = FirebaseDatabase.getInstance(mContext.getString(R.string.firebase_url)).getReference();;
+        mDatabase = FirebaseDatabase.getInstance(mContext.getString(R.string.firebase_url)).getReference();
+        ;
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         mStorage = FirebaseStorage.getInstance();
@@ -419,14 +489,31 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
         user_id = currentUser.getUid();
 
-        if (chat.getSender_user_id() !=  null && chat.getReply_chat_id() == null && chat.getSender_user_id().equals(user_id)) {
-            return MESSAGE_RIGHT;
+        if (chat.getSender_user_id() != null && chat.getReply_chat_id() == null && chat.getSender_user_id().equals(user_id)) {
+            if (chat.getMedia_type() != null && chat.getMedia() != null) {
+                return MESSAGE_MEDIA_RIGHT;
+            } else {
+                return MESSAGE_RIGHT;
+            }
         } else if (chat.getReply_chat_id() != null && chat.getSender_user_id().equals(user_id) && !chat.getReceiver_user_id().equals(user_id)) {
-            return MESSAGE_REPLY_RIGHT;
+            if (chat.getMedia_type() != null && chat.getMedia() != null) {
+                return MESSAGE_MEDIA_RIGHT;
+            } else {
+                return MESSAGE_REPLY_RIGHT;
+            }
         } else if (chat.getReply_chat_id() != null && !chat.getSender_user_id().equals(user_id) && chat.getReceiver_user_id().equals(user_id)) {
-            return MESSAGE_REPLY_LEFT;
+            if (chat.getMedia_type() != null && chat.getMedia() != null) {
+                return MESSAGE_MEDIA_LEFT;
+            } else {
+                return MESSAGE_REPLY_LEFT;
+            }
         } else {
-            return MESSAGE_LEFT;
+            if (chat.getMedia_type() != null && chat.getMedia() != null) {
+                return MESSAGE_MEDIA_LEFT;
+            } else {
+                return MESSAGE_LEFT;
+            }
+
         }
     }
 
@@ -434,9 +521,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
         private TextView tvChatMessage;
         private RelativeTimeTextView tvTime;
-        //private CardView chatCV;
+        private ImageView ivChatMediaImage;
 
-        private CardView replychatCV;
+        private CardView replychatCV, cvChatMedia;
         private TextView tvReplyChatName, tvReplyChatMessage;
         private LinearLayout senderreplychatLL;
 
@@ -452,6 +539,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             replychatCV = itemView.findViewById(R.id.replychatCV);
             //senderreplychatCV = itemView.findViewById(R.id.senderreplychatCV);
             senderreplychatLL = itemView.findViewById(R.id.senderreplychatLL);
+            ivChatMediaImage = itemView.findViewById(R.id.ivChatMediaImage);
+            cvChatMedia = itemView.findViewById(R.id.cvChatMedia);
         }
     }
 }

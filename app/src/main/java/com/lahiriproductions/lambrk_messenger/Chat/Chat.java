@@ -10,12 +10,14 @@ public class Chat {
     private String message = null;
     private boolean has_seen;
     private String reply_chat_id = null;
+    private String media;
+    private String media_type;
 
     public Chat() {
 
     }
 
-    public Chat(String sender_user_id, String receiver_user_id, long timestamp, String formatted_date, String chat_id, String message, boolean has_seen, String reply_chat_id) {
+    public Chat(String sender_user_id, String receiver_user_id, long timestamp, String formatted_date, String chat_id, String message, boolean has_seen, String reply_chat_id, String media, String media_type) {
         this.sender_user_id = sender_user_id;
         this.receiver_user_id = receiver_user_id;
         this.timestamp = timestamp;
@@ -24,6 +26,8 @@ public class Chat {
         this.message = message;
         this.has_seen = has_seen;
         this.reply_chat_id = reply_chat_id;
+        this.media = media;
+        this.media_type = media_type;
     }
 
     public String getSender_user_id() {
@@ -88,5 +92,21 @@ public class Chat {
 
     public void setReply_chat_id(String reply_chat_id) {
         this.reply_chat_id = reply_chat_id;
+    }
+
+    public String getMedia() {
+        return media;
+    }
+
+    public void setMedia(String media) {
+        this.media = media;
+    }
+
+    public String getMedia_type() {
+        return media_type;
+    }
+
+    public void setMedia_type(String media_type) {
+        this.media_type = media_type;
     }
 }

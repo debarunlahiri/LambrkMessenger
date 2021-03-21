@@ -186,13 +186,13 @@
                         layout="@layout/item_list_inbox_stories_layout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0.1" />
+                        android:visibility="gone"/>
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvStories"
+                        android:nestedScrollingEnabled="true"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1.9" />
+                        android:layout_height="wrap_content" />
                 </LinearLayout>
             </androidx.core.widget.NestedScrollView>
 

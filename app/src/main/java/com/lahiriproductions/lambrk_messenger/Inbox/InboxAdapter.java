@@ -97,7 +97,7 @@ public class InboxAdapter extends RecyclerView.Adapter<InboxAdapter.ViewHolder> 
 
     private void removeChatNotifications(ViewHolder holder, Inbox inbox) {
         if (inbox.getReceiver_user_id().equals(user_id)) {
-            mDatabase.child("notifications").child("chats").child(inbox.getReceiver_user_id()).child(inbox.getSender_user_id()).removeValue();
+            mDatabase.child("notifications").child(inbox.getReceiver_user_id()).child(inbox.getSender_user_id()).removeValue();
         }
 
     }
@@ -192,9 +192,17 @@ public class InboxAdapter extends RecyclerView.Adapter<InboxAdapter.ViewHolder> 
             }
         });
         if (inbox.getSender_user_id().equals(user_id)) {
-            holder.tvInboxMessage.setText("You: " + inbox.getMessage());
+            if (inbox.getMedia_type() != null) {
+                holder.tvInboxMessage.setText("You: " + inbox.getMedia_type());
+            } else {
+                holder.tvInboxMessage.setText("You: " + inbox.getMessage());
+            }
         } else {
-            holder.tvInboxMessage.setText(inbox.getMessage());
+            if (inbox.getMedia_type() != null) {
+                holder.tvInboxMessage.setText(inbox.getMedia_type());
+            } else {
+                holder.tvInboxMessage.setText(inbox.getMessage());
+            }
         }
         holder.tvInboxTime.setReferenceTime(inbox.getTimestamp());
     }

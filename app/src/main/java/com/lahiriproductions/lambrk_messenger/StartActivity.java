@@ -2,6 +2,7 @@ package com.lahiriproductions.lambrk_messenger;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -283,28 +284,40 @@ public class StartActivity extends AppCompatActivity implements AdapterView.OnIt
                         startActivity(mainIntent);
                         finishAffinity();
                     } else {
-                        HashMap<String, Object> mUserDataMap = new HashMap<>();
-                        mUserDataMap.put("bio", "");
-                        mUserDataMap.put("name", user.getDisplayName());
-                        mUserDataMap.put("profile_image", user.getPhotoUrl().toString());
-                        mUserDataMap.put("thumb_profile_image", user.getPhotoUrl().toString());
-                        mUserDataMap.put("acc_create_timestamp", user.getMetadata().getCreationTimestamp());
+                        SharedPreferences sharedPreferences = getSharedPreferences("setupUser", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("name", user.getDisplayName());
+                        editor.putString("profile_image", user.getPhotoUrl().toString());
+                        editor.putString("thumb_profile_image", user.getPhotoUrl().toString());
+                        editor.putString("token_id", Variables.token_id);
+                        editor.putLong("acc_create_timestamp", user.getMetadata().getCreationTimestamp());
+                        editor.apply();
 
-                        mDatabase.child("users").child(user.getUid()).child("user_data").updateChildren(mUserDataMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    mDatabase.child("users").child("user_id").setValue(user_id);
-                                    mDatabase.child("users").child(user_id).child("token_id").setValue(Variables.token_id);
-//                                                mDatabase.child("usernames").push().child("username").setValue(username);
-//                                    mDatabase.child("users").child(user_id).child("username").setValue(username);
-                                    mDatabase.child("users").child(user.getUid()).child("user_data").child("age_change_time_period").setValue(new Date(System.currentTimeMillis()+14L * 24 * 60 * 60 * 1000));
-                                    Intent finalSetupUserIntent = new Intent(StartActivity.this, SetupActivity.class);
-                                    startActivity(finalSetupUserIntent);
-                                    finishAffinity();
-                                }
-                            }
-                        });
+                        Intent finalSetupUserIntent = new Intent(StartActivity.this, SetupActivity.class);
+                        startActivity(finalSetupUserIntent);
+                        finishAffinity();
+
+
+//                        HashMap<String, Object> mUserDataMap = new HashMap<>();
+//                        mUserDataMap.put("bio", "");
+//                        mUserDataMap.put("name", user.getDisplayName());
+//                        mUserDataMap.put("profile_image", user.getPhotoUrl().toString());
+//                        mUserDataMap.put("thumb_profile_image", user.getPhotoUrl().toString());
+//                        mUserDataMap.put("acc_create_timestamp", user.getMetadata().getCreationTimestamp());
+
+//                        mDatabase.child("users").child(user.getUid()).child("user_data").updateChildren(mUserDataMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+//                            @Override
+//                            public void onComplete(@NonNull Task<Void> task) {
+//                                if (task.isSuccessful()) {
+//                                    mDatabase.child("users").child("user_id").setValue(user_id);
+//                                    mDatabase.child("users").child(user_id).child("token_id").setValue(Variables.token_id);
+//                                    mDatabase.child("users").child(user.getUid()).child("user_data").child("age_change_time_period").setValue(new Date(System.currentTimeMillis()+14L * 24 * 60 * 60 * 1000));
+//                                    Intent finalSetupUserIntent = new Intent(StartActivity.this, SetupActivity.class);
+//                                    startActivity(finalSetupUserIntent);
+//                                    finishAffinity();
+//                                }
+//                            }
+//                        });
 
 
                     }

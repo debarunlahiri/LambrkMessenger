@@ -32,6 +32,7 @@ import com.lahiriproductions.lambrk_messenger.Group.Group;
 import com.lahiriproductions.lambrk_messenger.Group.GroupAdapter;
 import com.lahiriproductions.lambrk_messenger.Settings.SettingsActivity;
 import com.lahiriproductions.lambrk_messenger.Stories.Stories;
+import com.lahiriproductions.lambrk_messenger.Stories.StoriesActivity;
 import com.lahiriproductions.lambrk_messenger.Stories.StoryUserProfileViewerActivity;
 import com.lahiriproductions.lambrk_messenger.Utils.FollowingActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -141,7 +142,7 @@ public class OverallProfileActivity extends AppCompatActivity {
 
         storiesuserprofileRV = findViewById(R.id.storiesuserprofileRV);
         profileStoriesAdapter = new ProfileStoriesAdapter(storiesList, mContext);
-        linearLayoutManagerHorizontal = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, true);
+        linearLayoutManagerHorizontal = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
         storiesuserprofileRV.setAdapter(profileStoriesAdapter);
         storiesuserprofileRV.setLayoutManager(linearLayoutManagerHorizontal);
         storiesuserprofileRV.setHasFixedSize(true);
@@ -667,7 +668,7 @@ public class OverallProfileActivity extends AppCompatActivity {
             holder.storiesprofilelistCV.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent storyIntent = new Intent(mContext, StoryUserProfileViewerActivity.class);
+                    Intent storyIntent = new Intent(mContext, StoriesActivity.class);
                     storyIntent.putExtra("story_id", stories.getStory_id());
                     storyIntent.putExtra("story_user_id", searched_user_id);
                     mContext.startActivity(storyIntent);

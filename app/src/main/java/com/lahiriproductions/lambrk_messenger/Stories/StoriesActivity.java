@@ -32,6 +32,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -40,6 +41,7 @@ public class StoriesActivity extends AppCompatActivity implements View.OnTouchLi
     private CardView storiestopCV;
     private TextView tvStoryName;
     private CircleImageView storyuserprofileCIV;
+    ViewPager storiesVP;
 
     private List<Stories> storiesList = new ArrayList<>();
     private Context mContext;
@@ -52,7 +54,8 @@ public class StoriesActivity extends AppCompatActivity implements View.OnTouchLi
 
     private String user_id;
 
-    private String story_user_id;
+    private String story_user_id, story_id;
+    Bundle bundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,14 +66,15 @@ public class StoriesActivity extends AppCompatActivity implements View.OnTouchLi
 
         mContext = StoriesActivity.this;
 
-        Bundle bundle = getIntent().getExtras();
+        bundle = getIntent().getExtras();
         story_user_id = bundle.get("story_user_id").toString();
+//        story_id = bundle.get("story_id").toString();
 
         storiestopCV = findViewById(R.id.storiestopCV);
         tvStoryName = findViewById(R.id.tvStoryName);
         storyuserprofileCIV = findViewById(R.id.storyuserprofileCIV);
 
-        ViewPager storiesVP = findViewById(R.id.storiesVP);
+        storiesVP = findViewById(R.id.storiesVP);
         StoriesViewPageAdapter storiesViewPageAdapter = new StoriesViewPageAdapter(storiesList, mContext);
         storiesVP.setAdapter(storiesViewPageAdapter);
 
@@ -113,12 +117,15 @@ public class StoriesActivity extends AppCompatActivity implements View.OnTouchLi
             }
         });
 
+
         mDatabase.child("stories").child(story_user_id).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 Stories stories = dataSnapshot.getValue(Stories.class);
                 storiesList.add(stories);
                 storiesViewPageAdapter.notifyDataSetChanged();
+
+                setCurrentPosition();
             }
 
             @Override
@@ -142,6 +149,19 @@ public class StoriesActivity extends AppCompatActivity implements View.OnTouchLi
             }
         });
 
+
+    }
+
+    private void setCurrentPosition() {
+        for (int i=0; i<storiesList.size(); i++) {
+            if (bundle.get("story_id") != null && storiesList.get(i).getStory_id().equals(bundle.get("story_id").toString())) {
+                storiesVP.setCurrentItem(i);
+                break;
+            } else if (bundle.get("story_id") == null && storiesList.get(i).getSeen() != null && storiesList.get(i).getSeen().getIsHas_seen_story()) {
+                storiesVP.setCurrentItem(i);
+                break;
+            }
+        }
     }
 
     @Override

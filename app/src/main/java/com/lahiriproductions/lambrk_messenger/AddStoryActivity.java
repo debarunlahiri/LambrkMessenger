@@ -286,7 +286,7 @@ public class AddStoryActivity extends AppCompatActivity {
             progressDialog.setMessage("Adding story");
             progressDialog.show();
             File mFileGroupProfileImage = new File(postImageUri.getPath());
-
+            String story_id = mDatabase.child("stories").child(user_id).push().getKey();
             final Long ts_long = System.currentTimeMillis() / 1000;
             final String ts = ts_long.toString();
             //final StorageReference childRef = storageReference.child("users/profiles/profile_images/" + currentUser.getUid() + ".jpg");
@@ -303,7 +303,7 @@ public class AddStoryActivity extends AppCompatActivity {
             mCompressedStoryImage.compress(Bitmap.CompressFormat.JPEG, 25, mProfileBAOS);
             byte[] mProfileThumbData = mProfileBAOS.toByteArray();
 
-            final StorageReference mThumbChildRefProfile = storageReference.child("group/profiles/profile_images/" + currentUser.getUid() + "/thumb/" + ts + ".jpg");
+            final StorageReference mThumbChildRefProfile = storageReference.child("stories/" + currentUser.getUid() + "/" + story_id + ".jpg");
 
             final UploadTask profile_thumb_uploadTask = mThumbChildRefProfile.putBytes(mProfileThumbData);
 
@@ -326,7 +326,6 @@ public class AddStoryActivity extends AppCompatActivity {
                                     Uri profile_thumb_downloadUri = task.getResult();
                                     if (task.isSuccessful()) {
                                         Uri downloadUri = task.getResult();
-                                        String story_id = mDatabase.child("stories").child(user_id).push().getKey();
                                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
                                         String formattedDate = sdf.format(new Date());
                                         HashMap<String, Object> mPostDataMap = new HashMap<>();

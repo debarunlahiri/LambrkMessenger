@@ -4,17 +4,22 @@
 
     <item
         android:id="@+id/message_reply_item"
+        android:icon="@drawable/ic_baseline_reply_24"
         android:title="Reply" />
     <item
         android:id="@+id/message_copy_item"
+        android:icon="@drawable/ic_baseline_content_copy_24"
         android:title="Copy Message" />
     <item
         android:id="@+id/message_edit_item"
+        android:icon="@drawable/ic_baseline_edit_24"
         android:title="Edit" />
     <item
         android:id="@+id/message_delete_item"
+        android:icon="@drawable/ic_baseline_delete_24"
         android:title="Delete" />
     <item
         android:id="@+id/message_delete_for_everyone_item"
+        android:icon="@drawable/ic_baseline_delete_forever_24"
         android:title="Delete for Everyone" />
 </menu>

@@ -11,12 +11,14 @@ public class Inbox {
     private String user_key = null;
     private String reply_chat_id = null;
     private String chat_id = null;
+    private String media;
+    private String media_type;
 
     public Inbox() {
 
     }
 
-    public Inbox(String message, String sender_user_id, String receiver_user_id, long timestamp, boolean has_seen, String formatted_Date, String user_key, String reply_chat_id, String chat_idchat_id) {
+    public Inbox(String message, String sender_user_id, String receiver_user_id, long timestamp, boolean has_seen, String formatted_Date, String user_key, String reply_chat_id, String chat_id, String media, String media_type) {
         this.message = message;
         this.sender_user_id = sender_user_id;
         this.receiver_user_id = receiver_user_id;
@@ -26,6 +28,8 @@ public class Inbox {
         this.user_key = user_key;
         this.reply_chat_id = reply_chat_id;
         this.chat_id = chat_id;
+        this.media = media;
+        this.media_type = media_type;
     }
 
     public String getMessage() {
@@ -98,5 +102,21 @@ public class Inbox {
 
     public void setChat_id(String chat_id) {
         this.chat_id = chat_id;
+    }
+
+    public String getMedia() {
+        return media;
+    }
+
+    public void setMedia(String media) {
+        this.media = media;
+    }
+
+    public String getMedia_type() {
+        return media_type;
+    }
+
+    public void setMedia_type(String media_type) {
+        this.media_type = media_type;
     }
 }

@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
+        android:requestLegacyExternalStorage="true"
         android:allowBackup="false"
         android:exported="true"
         android:icon="@mipmap/ic_launcher"
@@ -20,7 +21,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Group.GroupActiveMembersActivity"></activity>
+        <activity android:name=".Shortcuts.AddVideoActivity"></activity>
+        <activity android:name=".Chat.ChatMediaActivity" />
+        <activity android:name=".SplashScreenActivity" />
+        <activity android:name=".UpdateAppActivity" />
+        <activity android:name=".Group.GroupActiveMembersActivity" />
         <activity android:name=".WebViewActivity" />
         <activity android:name=".Group.InviteGroupActivity" />
         <activity android:name=".SetupUser.SetupActivity" />

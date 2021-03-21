@@ -108,7 +108,10 @@ public class NotificationsActivity extends AppCompatActivity {
 
                 Notifications notifications = dataSnapshot.getValue(Notifications.class);
                 if (!(notifications.getNotification_type().equalsIgnoreCase("following_notification") && notifications.getFrom_user_id().equals(user_id))) {
-                    notificationsList.add(notifications);
+                    if (notifications.getTo_user_id().equals(user_id) && !notifications.getFrom_user_id().equals(user_id)) {
+                        notificationsList.add(notifications);
+
+                    }
                 }
                 notificationsAdapter.notifyDataSetChanged();
                 Log.d(TAG, "notificationList: " + new GsonBuilder().setPrettyPrinting().create().toJson(notificationsList));

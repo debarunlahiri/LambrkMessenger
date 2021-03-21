@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -32,6 +33,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.lahiriproductions.lambrk_messenger.Utils.Variables;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -51,15 +53,29 @@ public class SetupActivity extends AppCompatActivity implements AdapterView.OnIt
     private FirebaseStorage mStorage;
     private StorageReference storageReference;
 
-    public String ds_username;
+    public String ds_username, name, profile_image, thumb_profile_image;
     private String gender;
     private String user_id;
+    private long acc_create_timestamp;
     public boolean hasUsername = false;
+
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup);
+
+        sharedPreferences = getSharedPreferences("setupUser", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        if (sharedPreferences.contains("name")) {
+            name = sharedPreferences.getString("name", "");
+            profile_image = sharedPreferences.getString("profile_image", "");
+            thumb_profile_image = sharedPreferences.getString("thumb_profile_image", "");
+            acc_create_timestamp = sharedPreferences.getLong("acc_create_timestamp", 0);
+            Variables.token_id = sharedPreferences.getString("token_id", "");
+        }
 
         setuptoolbar = findViewById(R.id.setuptoolbar);
         setuptoolbar.setTitle("Setup User");
@@ -156,24 +172,56 @@ public class SetupActivity extends AppCompatActivity implements AdapterView.OnIt
                                 mUserDataMap.put("bio", "");
                                 mUserDataMap.put("gender", gender);
                                 mUserDataMap.put("username", username);
+                                mUserDataMap.put("name", name);
+                                mUserDataMap.put("profile_image", profile_image);
+                                mUserDataMap.put("thumb_profile_image", thumb_profile_image);
+                                mUserDataMap.put("acc_create_timestamp", acc_create_timestamp);
 
                                 mDatabase.child("users").child(currentUser.getUid()).child("user_data").updateChildren(mUserDataMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
-                                            mDatabase.child("users").child("user_id").setValue(user_id);
-                                            mDatabase.child("usernames").child(username).child("username").setValue(username);
-                                            mDatabase.child("users").child(currentUser.getUid()).child("username").setValue(username);
-                                            mDatabase.child("users").child(currentUser.getUid()).child("user_data").child("age_change_time_period").setValue(new Date(System.currentTimeMillis() + 14L * 24 * 60 * 60 * 1000));
-                                            new Handler().postDelayed(new Runnable() {
+                                            mDatabase.child("users").child(currentUser.getUid()).child("user_id").setValue(currentUser.getUid()).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
-                                                public void run() {
-                                                    Toast.makeText(getApplicationContext(), "Profile created successfully", Toast.LENGTH_LONG).show();
-                                                    Intent finalSetupUserIntent = new Intent(SetupActivity.this, MainActivity.class);
-                                                    startActivity(finalSetupUserIntent);
-                                                    finishAffinity();
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        mDatabase.child("users").child(currentUser.getUid()).child("token_id").setValue(Variables.token_id).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    mDatabase.child("usernames").child(username).child("username").setValue(username).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                        @Override
+                                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                                            if (task.isSuccessful()) {
+                                                                                mDatabase.child("users").child(currentUser.getUid()).child("username").setValue(username).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                    @Override
+                                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                                        if (task.isSuccessful()) {
+                                                                                            mDatabase.child("users").child(currentUser.getUid()).child("user_data").child("age_change_time_period").setValue(new Date(System.currentTimeMillis() + 14L * 24 * 60 * 60 * 1000));
+                                                                                            new Handler().postDelayed(new Runnable() {
+                                                                                                @Override
+                                                                                                public void run() {
+                                                                                                    editor.clear();
+                                                                                                    editor.apply();
+                                                                                                    Toast.makeText(getApplicationContext(), "Profile created successfully", Toast.LENGTH_LONG).show();
+                                                                                                    Intent finalSetupUserIntent = new Intent(SetupActivity.this, MainActivity.class);
+                                                                                                    startActivity(finalSetupUserIntent);
+                                                                                                    finishAffinity();
+                                                                                                }
+                                                                                            }, 1000);
+                                                                                        }
+                                                                                    }
+                                                                                });
+                                                                            }
+                                                                        }
+                                                                    });
+                                                                }
+                                                            }
+                                                        });
+
+                                                    }
                                                 }
-                                            }, 1500);
+                                            });
                                         }
                                     }
                                 });
@@ -210,11 +258,11 @@ public class SetupActivity extends AppCompatActivity implements AdapterView.OnIt
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.logout_setup_menu_list_item:
+                mAuth.signOut();
                 Intent setupUserIntent = new Intent(SetupActivity.this, StartActivity.class);
                 setupUserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(setupUserIntent);
-                finish();
-                mAuth.signOut();
+                finishAffinity();
 
             default:
                 return super.onOptionsItemSelected(item);

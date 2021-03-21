@@ -8,10 +8,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.dynamic.IFragmentWrapper;
+import com.google.firebase.database.ChildEventListener;
+import com.lahiriproductions.lambrk_messenger.AddStoryActivity;
 import com.lahiriproductions.lambrk_messenger.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,6 +33,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.ViewHolder> {
 
+    private static final int ADD_STORIES_VIEW = 0;
+    private static final int STORIES_VIEW = 1;
     private List<Stories> storiesList;
     private Context mContext;
 
@@ -48,14 +54,18 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.stories_list_item, parent, false);
+        View view = null;
+        if (viewType == ADD_STORIES_VIEW) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list_inbox_stories_layout, parent, false);
+        } else {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.stories_list_item, parent, false);
+        }
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Stories stories = storiesList.get(position);
-        holder.storieslistitemprofileCV.setBackgroundResource(R.drawable.story_profile_bg);
         mDatabase = FirebaseDatabase.getInstance(mContext.getString(R.string.firebase_url)).getReference();;
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
@@ -64,14 +74,86 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.ViewHold
 
         user_id = currentUser.getUid();
 
-        setStory(holder, stories);
+        if (position == 0) {
+            mDatabase.child("users").child(user_id).child("user_data").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        String thumb_profile_image = snapshot.child("thumb_profile_image").getValue().toString();
+                        Glide.with(mContext).load(thumb_profile_image).placeholder(R.drawable.ic_baseline_account_circle_24).into(holder.civStoryProfilePic);
+                    }
+                }
 
-        holder.storylistitemCV.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+            fetchStories(holder);
+
+            holder.cvAddStory.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent notificationIntent = new Intent(mContext, AddStoryActivity.class);
+                    mContext.startActivity(notificationIntent);
+                }
+            });
+
+            holder.cvStory.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent storyIntent = new Intent(mContext, StoriesActivity.class);
+                    storyIntent.putExtra("story_user_id", user_id);
+                    mContext.startActivity(storyIntent);
+                }
+            });
+
+        } else {
+            setStory(holder, stories);
+            holder.storieslistitemprofileCV.setBackgroundResource(R.drawable.story_profile_bg);
+            holder.storylistitemCV.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent storyIntent = new Intent(mContext, StoriesActivity.class);
+                    storyIntent.putExtra("story_user_id", stories.getUser_id());
+                    mContext.startActivity(storyIntent);
+                }
+            });
+        }
+
+    }
+
+    private void fetchStories(ViewHolder holder) {
+        mDatabase.child("stories").child(currentUser.getUid()).limitToLast(1).addChildEventListener(new ChildEventListener() {
             @Override
-            public void onClick(View view) {
-                Intent storyIntent = new Intent(mContext, StoriesActivity.class);
-                storyIntent.putExtra("story_user_id", stories.getUser_id());
-                mContext.startActivity(storyIntent);
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                if (dataSnapshot.exists()) {
+                    Stories stories = dataSnapshot.getValue(Stories.class);
+                    Glide.with(mContext).load(stories.getStory_image()).into(holder.ivStory);
+//                    cvAdd.setVisibility(View.GONE);
+                } else {
+//                    cvAdd.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
     }
@@ -102,11 +184,20 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.ViewHold
         return storiesList.size();
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        if (position == 0) {
+            return ADD_STORIES_VIEW;
+        } else {
+            return STORIES_VIEW;
+        }
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        private CardView storylistitemCV, storieslistitemprofileCV;
-        private ImageView storieslistitemStoryIV;
-        private CircleImageView storieslistitemuserprofileCIV;
+        private CardView storylistitemCV, storieslistitemprofileCV, cvAddStory, cvStory;
+        private ImageView storieslistitemStoryIV, ivStory;
+        private CircleImageView storieslistitemuserprofileCIV, civStoryProfilePic;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -114,6 +205,10 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.ViewHold
             storylistitemCV = itemView.findViewById(R.id.storylistitemCV);
             storieslistitemStoryIV = itemView.findViewById(R.id.storieslistitemStoryIV);
             storieslistitemuserprofileCIV = itemView.findViewById(R.id.storieslistitemuserprofileCIV);
+            civStoryProfilePic = itemView.findViewById(R.id.civStoryProfilePic);
+            ivStory = itemView.findViewById(R.id.ivStory);
+            cvAddStory = itemView.findViewById(R.id.cvAddStory);
+            cvStory = itemView.findViewById(R.id.cvStory);
         }
     }
 }

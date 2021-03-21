@@ -1,6 +1,16 @@
 package com.lahiriproductions.lambrk_messenger.Stories;
 
-public class Stories {
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.io.Serializable;
+
+public class Stories implements Serializable {
 
     private String user_id = null;
     private String story_caption = null;
@@ -9,6 +19,9 @@ public class Stories {
     private String story_id = null;
     private String story_image = null;
     private String body;
+    private Seen seen;
+
+
 
     private boolean userHasLiked = false;
 
@@ -88,5 +101,13 @@ public class Stories {
 
     public void setUserHasLiked(boolean userHasLiked) {
         this.userHasLiked = userHasLiked;
+    }
+
+    public Seen getSeen() {
+        return seen;
+    }
+
+    public void setSeen(Seen seen) {
+        this.seen = seen;
     }
 }

@@ -130,7 +130,7 @@ public class InboxFragment extends Fragment {
         rvStories.setAdapter(storiesAdapter);
         rvStories.setLayoutManager(storiesLinearLayoutManager);
         storiesLinearLayoutManager.setStackFromEnd(true);
-        storiesLinearLayoutManager.setReverseLayout(true);
+        storiesLinearLayoutManager.setReverseLayout(false);
 
         mDatabase = FirebaseDatabase.getInstance(getString(R.string.firebase_url)).getReference();;
         mAuth = FirebaseAuth.getInstance();

@@ -88,6 +88,7 @@ public class ExploreFragment extends Fragment {
         exploreAdapter = new ExploreAdapter(mContext, exploreList, "for_explore");
         linearLayoutManager = new LinearLayoutManager(mContext);
         rvExplore.setAdapter(exploreAdapter);
+        linearLayoutManager.setReverseLayout(true);
         rvExplore.setLayoutManager(linearLayoutManager);
 
         if (currentUser != null) {
@@ -98,7 +99,9 @@ public class ExploreFragment extends Fragment {
                     if (dataSnapshot.exists()) {
                         if (dataSnapshot.child("profile_image").exists()) {
                             String profile_image = dataSnapshot.child("profile_image").getValue().toString();
-                            Glide.with(mContext).load(profile_image).into(groupfragmentprofileCIV);
+                            if (getActivity() != null) {
+                                Glide.with(mContext).load(profile_image).into(groupfragmentprofileCIV);
+                            }
                         }
                     }
                 }

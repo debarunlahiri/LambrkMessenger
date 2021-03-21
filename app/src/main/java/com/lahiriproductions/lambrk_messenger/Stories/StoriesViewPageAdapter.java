@@ -20,7 +20,6 @@ import androidx.viewpager.widget.PagerAdapter;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.lahiriproductions.lambrk_messenger.R;
 import com.github.curioustechizen.ago.RelativeTimeTextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,6 +30,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.lahiriproductions.lambrk_messenger.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -76,7 +76,7 @@ public class StoriesViewPageAdapter extends PagerAdapter implements View.OnTouch
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
         View view = layoutInflater.inflate(R.layout.stories_viewpager_list_item, container, false);
         Stories stories = storiesList.get(position);
-        mDatabase = FirebaseDatabase.getInstance(mContext.getString(R.string.firebase_url)).getReference();;
+        mDatabase = FirebaseDatabase.getInstance(mContext.getString(R.string.firebase_url)).getReference();
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         mStorage = FirebaseStorage.getInstance();
@@ -257,6 +257,26 @@ public class StoriesViewPageAdapter extends PagerAdapter implements View.OnTouch
                 showCommentIntent.putExtra("story_id", stories.getStory_id());
                 showCommentIntent.putExtra("story_user_id", stories.getUser_id());
                 mContext.startActivity(showCommentIntent);
+            }
+        });
+
+        HashMap<String, Object> mStorySeenDataMap = new HashMap<>();
+        mStorySeenDataMap.put("story_id", stories.getStory_id());
+        mStorySeenDataMap.put("user_id", user_id);
+        mStorySeenDataMap.put("story_user_id", stories.getUser_id());
+        mStorySeenDataMap.put("timestamp", System.currentTimeMillis());
+        mStorySeenDataMap.put("has_seen_story", true);
+        mDatabase.child("stories").child(stories.getUser_id()).child(stories.getStory_id()).child("seen").child(user_id).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    mDatabase.child("stories").child(stories.getUser_id()).child(stories.getStory_id()).child("seen").child(user_id).setValue(mStorySeenDataMap);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
 
