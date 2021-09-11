@@ -16,5 +16,6 @@
     <item
         android:id="@+id/shortcuts_home_menu_list_item"
         android:icon="@drawable/frame"
-        android:title="Shortcuts" />
+        android:title="Shortcuts"
+        android:visible="false"/>
 </menu>

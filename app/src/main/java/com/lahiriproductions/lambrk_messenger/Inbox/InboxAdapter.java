@@ -52,6 +52,7 @@ public class InboxAdapter extends RecyclerView.Adapter<InboxAdapter.ViewHolder> 
         this.inboxList = inboxList;
         this.mContext = mContext;
     }
+    //check
 
     @NonNull
     @Override

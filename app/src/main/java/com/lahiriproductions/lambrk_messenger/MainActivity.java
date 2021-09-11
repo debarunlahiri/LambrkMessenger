@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -83,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         FirebaseApp.initializeApp(this);
+        MobileAds.initialize(this);
+
 
         sharedPreferences = getSharedPreferences("setupUser", MODE_PRIVATE);
         editor = sharedPreferences.edit();
@@ -177,6 +180,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+
+        startActivity(new Intent(this, BillingActivity.class));
     }
 
     private void beginFragmentTransaction() {
