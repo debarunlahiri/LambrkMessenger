@@ -180,11 +180,11 @@ public class ChnageBackgroundActivity extends AppCompatActivity {
         //final StorageReference childRef = storageReference.child("users/profiles/profile_images/" + currentUser.getUid() + ".jpg");
         //final StorageReference thumb_childRef = storageReference.child("users/profile_images/profile_images/" + currentUser.getUid() + ".jpg");
 
-        try {
-            mCompressedStoryImage = new Compressor(ChnageBackgroundActivity.this).setQuality(8).compressToBitmap(mFileGroupProfileImage);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            mCompressedStoryImage = new Compressor(ChnageBackgroundActivity.this).setQuality(8).compressToBitmap(mFileGroupProfileImage);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
 
         ByteArrayOutputStream mProfileBAOS = new ByteArrayOutputStream();

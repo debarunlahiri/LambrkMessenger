@@ -25,13 +25,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
 import com.lahiriproductions.lambrk_messenger.Explore.ExploreFragment;
 import com.lahiriproductions.lambrk_messenger.Group.GroupFragment;
 import com.lahiriproductions.lambrk_messenger.Inbox.InboxFragment;
@@ -84,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         FirebaseApp.initializeApp(this);
-        MobileAds.initialize(this);
 
 
         sharedPreferences = getSharedPreferences("setupUser", MODE_PRIVATE);
@@ -122,15 +118,15 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists()) {
-                        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                                if (task.isSuccessful()) {
-                                    Variables.token_id = task.getResult().getToken();
-                                    mDatabase.child("users").child(user_id).child("token_id").setValue(Variables.token_id);
-                                }
-                            }
-                        });
+//                        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+//                            @Override
+//                            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+//                                if (task.isSuccessful()) {
+//                                    Variables.token_id = task.getResult().getToken();
+//                                    mDatabase.child("users").child(user_id).child("token_id").setValue(Variables.token_id);
+//                                }
+//                            }
+//                        });
 
                         mDatabase.child("users").child(user_id).child("privacy").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -181,7 +177,6 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        startActivity(new Intent(this, BillingActivity.class));
     }
 
     private void beginFragmentTransaction() {

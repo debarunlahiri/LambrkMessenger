@@ -22,21 +22,16 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.facebook.AccessTokenTracker;
+import com.facebook.CallbackManager;
+import com.facebook.login.LoginBehavior;
+import com.facebook.login.widget.LoginButton;
 import com.lahiriproductions.lambrk_messenger.LoginActivity;
 import com.lahiriproductions.lambrk_messenger.MainActivity;
 import com.lahiriproductions.lambrk_messenger.R;
 import com.lahiriproductions.lambrk_messenger.RegisterActivity;
 import com.lahiriproductions.lambrk_messenger.SetupUser.SetupActivity;
 import com.lahiriproductions.lambrk_messenger.Utils.Variables;
-import com.facebook.AccessToken;
-import com.facebook.AccessTokenTracker;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
-import com.facebook.login.LoginBehavior;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -47,7 +42,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
@@ -56,8 +50,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -90,18 +82,11 @@ public class StartActivity extends AppCompatActivity implements AdapterView.OnIt
     private CallbackManager callbackManager;
     private LoginButton loginButton;
     private FirebaseAuth.AuthStateListener authStateListener;
-    private AccessTokenTracker accessTokenTracker;
-
-    private static final String FACEBOOK_EMAIL = "email";
-    private static final String FACEBOOK_ID = "id";
-    private static final String FACEBOOK_NAME = "name";
-    private static final String FACEBOOK_PICTURE = "picture";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
-        FacebookSdk.sdkInitialize(StartActivity.this);
 //        AppEventsLogger.activateApp(StartActivity.this);
         callbackManager = CallbackManager.Factory.create();
 
@@ -124,7 +109,6 @@ public class StartActivity extends AppCompatActivity implements AdapterView.OnIt
         startregisterbutton = findViewById(R.id.startregisterbutton);
         bGoogleSignIn = findViewById(R.id.bGoogleSignIn);
         loginButton = (LoginButton) findViewById(R.id.login_button);
-        loginButton.setReadPermissions(FACEBOOK_EMAIL);
         loginButton.setLoginBehavior( LoginBehavior.WEB_ONLY );
         bGoogleSignIn.setSize(SignInButton.SIZE_WIDE);
 
@@ -152,35 +136,16 @@ public class StartActivity extends AppCompatActivity implements AdapterView.OnIt
             }
         });
 
-        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-            @Override
-            public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                if (task.isSuccessful()) {
-                    Variables.token_id = task.getResult().getToken();
-                }
-            }
-        });
+//        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+//            @Override
+//            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+//                if (task.isSuccessful()) {
+//                    Variables.token_id = task.getResult().getToken();
+//                }
+//            }
+//        });
 
-        // Callback registration
-        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                // App code
-                handleFacebookToken(loginResult.getAccessToken());
-            }
 
-            @Override
-            public void onCancel() {
-                // App code
-                Log.d(TAG, "Facebook login cancelled");
-            }
-
-            @Override
-            public void onError(FacebookException exception) {
-                // App code
-                Log.d(TAG, "facebookLogin: " + exception.getMessage());
-            }
-        });
 
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -192,28 +157,6 @@ public class StartActivity extends AppCompatActivity implements AdapterView.OnIt
             }
         };
 
-        accessTokenTracker = new AccessTokenTracker() {
-            @Override
-            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
-                if (currentAccessToken == null) {
-                    mAuth.signOut();
-                }
-            }
-        };
-
-    }
-
-    private void handleFacebookToken(AccessToken accessToken) {
-        AuthCredential authCredential = FacebookAuthProvider.getCredential(accessToken.getToken());
-        mAuth.signInWithCredential(authCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    FirebaseUser firebaseUser = mAuth.getCurrentUser();
-                    updateUI(firebaseUser);
-                }
-            }
-        });
     }
 
     @Override
@@ -249,7 +192,7 @@ public class StartActivity extends AppCompatActivity implements AdapterView.OnIt
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            FirebaseInstanceId.getInstance().getToken();
+//                            FirebaseInstanceId.getInstance().getToken();
                             updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.

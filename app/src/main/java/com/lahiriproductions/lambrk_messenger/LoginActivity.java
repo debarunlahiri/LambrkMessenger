@@ -22,7 +22,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -88,24 +87,24 @@ public class LoginActivity extends AppCompatActivity {
                         inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
                         etLoginPassword.setError("Please enter your password");
                     } else {
-                        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()) {
-                                    String token_id = FirebaseInstanceId.getInstance().getToken();
-                                    mDatabase.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("token_id").setValue(token_id);
-                                    sendToMain();
-                                }
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                loginPB.setVisibility(View.GONE);
-                                loginbutton.setText("Login");
-                                loginbutton.setEnabled(true);
-                                Toast.makeText(getApplicationContext(), "Failure: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                            }
-                        });
+//                        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+//                            @Override
+//                            public void onComplete(@NonNull Task<AuthResult> task) {
+//                                if (task.isSuccessful()) {
+//                                    String token_id = FirebaseInstanceId.getInstance().getToken();
+//                                    mDatabase.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("token_id").setValue(token_id);
+//                                    sendToMain();
+//                                }
+//                            }
+//                        }).addOnFailureListener(new OnFailureListener() {
+//                            @Override
+//                            public void onFailure(@NonNull Exception e) {
+//                                loginPB.setVisibility(View.GONE);
+//                                loginbutton.setText("Login");
+//                                loginbutton.setEnabled(true);
+//                                Toast.makeText(getApplicationContext(), "Failure: " + e.getMessage(), Toast.LENGTH_LONG).show();
+//                            }
+//                        });
                     }
 
 

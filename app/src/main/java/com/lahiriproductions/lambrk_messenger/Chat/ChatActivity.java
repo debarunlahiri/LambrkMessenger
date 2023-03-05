@@ -339,7 +339,7 @@ public class ChatActivity extends AppCompatActivity implements ChatMultipleImage
             //final StorageReference childRef = storageReference.child("users/profiles/profile_images/" + currentUser.getUid() + ".jpg");
             //final StorageReference thumb_childRef = storageReference.child("users/profile_images/profile_images/" + currentUser.getUid() + ".jpg");
 
-            mCompressedStoryImage = new Compressor(ChatActivity.this).setQuality(8).compressToBitmap(mFileGroupProfileImage);
+//            mCompressedStoryImage = new Compressor(ChatActivity.this).setQuality(8).compressToBitmap(mFileGroupProfileImage);
 
 
             ByteArrayOutputStream mProfileBAOS = new ByteArrayOutputStream();

@@ -45,7 +45,6 @@
                     android:layout_height="match_parent">
 
                     <ImageView
-                        android:id="@+id/imageView5"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:tint="@color/md_green_600"
@@ -119,7 +118,6 @@
     </androidx.cardview.widget.CardView>
 
     <View
-        android:id="@+id/view4"
         android:layout_width="wrap_content"
         android:layout_height="0.5dp"
         android:background="@color/colorLightGray"

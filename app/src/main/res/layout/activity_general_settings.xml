@@ -36,7 +36,6 @@
                 android:foreground="?attr/selectableItemBackground">
 
                 <TextView
-                    android:id="@+id/textView20"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
@@ -57,7 +56,6 @@
                 android:foreground="?attr/selectableItemBackground">
 
                 <TextView
-                    android:id="@+id/textView32"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
@@ -78,7 +76,6 @@
                 android:foreground="?attr/selectableItemBackground">
 
                 <TextView
-                    android:id="@+id/textView33"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
@@ -99,7 +96,6 @@
                 android:foreground="?attr/selectableItemBackground">
 
                 <TextView
-                    android:id="@+id/textView34"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
@@ -120,7 +116,6 @@
                 android:foreground="?attr/selectableItemBackground">
 
                 <TextView
-                    android:id="@+id/textView35"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"

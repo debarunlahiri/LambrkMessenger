@@ -50,8 +50,8 @@ public class ShortcutsFragment extends Fragment {
         bCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent addVideoIntent = new Intent(mContext, AddVideoActivity.class);
-                startActivity(addVideoIntent);
+//                Intent addVideoIntent = new Intent(mContext, AddVideoActivity.class);
+//                startActivity(addVideoIntent);
             }
         });
     }

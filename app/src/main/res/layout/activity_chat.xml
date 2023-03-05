@@ -204,7 +204,6 @@
                 app:srcCompat="@mipmap/black_back" />
 
             <ImageView
-                android:id="@+id/imageView2"
                 android:layout_width="10dp"
                 android:layout_height="10dp"
                 android:layout_marginStart="8dp"

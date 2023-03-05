@@ -443,11 +443,11 @@ public class GroupActivity extends AppCompatActivity {
         //final StorageReference childRef = storageReference.child("users/profiles/profile_images/" + currentUser.getUid() + ".jpg");
         //final StorageReference thumb_childRef = storageReference.child("users/profile_images/profile_images/" + currentUser.getUid() + ".jpg");
 
-        try {
-            mCompressedGroupProfileImage = new Compressor(GroupActivity.this).setQuality(50).compressToBitmap(mFileGroupProfileImage);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            mCompressedGroupProfileImage = new Compressor(GroupActivity.this).setQuality(50).compressToBitmap(mFileGroupProfileImage);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
 
         ByteArrayOutputStream mProfileBAOS = new ByteArrayOutputStream();

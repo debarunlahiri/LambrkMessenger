@@ -205,7 +205,6 @@
     </androidx.cardview.widget.CardView>
 
     <View
-        android:id="@+id/view3"
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:layout_marginTop="4dp"

@@ -90,16 +90,16 @@ public class CreateGroupFinalActivity extends AppCompatActivity {
         //final StorageReference childRef = storageReference.child("users/profiles/profile_images/" + currentUser.getUid() + ".jpg");
         //final StorageReference thumb_childRef = storageReference.child("users/profile_images/profile_images/" + currentUser.getUid() + ".jpg");
 
-        try {
-            mCompressedGroupProfileImage = new Compressor(CreateGroupFinalActivity.this).setQuality(8).compressToBitmap(mFileGroupProfileImage);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            mCompressedGroupCoverImage = new Compressor(CreateGroupFinalActivity.this).setQuality(8).compressToBitmap(mFileGroupCoverImage);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            mCompressedGroupProfileImage = new Compressor(CreateGroupFinalActivity.this).setQuality(8).compressToBitmap(mFileGroupProfileImage);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        try {
+//            mCompressedGroupCoverImage = new Compressor(CreateGroupFinalActivity.this).setQuality(8).compressToBitmap(mFileGroupCoverImage);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         ByteArrayOutputStream mProfileBAOS = new ByteArrayOutputStream();
         mCompressedGroupProfileImage.compress(Bitmap.CompressFormat.JPEG, 25, mProfileBAOS);

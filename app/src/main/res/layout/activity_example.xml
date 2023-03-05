@@ -28,7 +28,6 @@
                 app:cardElevation="2dp">
 
                 <ImageView
-                    android:id="@+id/imageView6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -38,7 +37,6 @@
             </androidx.cardview.widget.CardView>
 
             <TextView
-                android:id="@+id/textView8"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="View All"

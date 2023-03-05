@@ -198,11 +198,11 @@ public class SettingsChangeProfilePictureActivity extends AppCompatActivity {
         //final StorageReference childRef = storageReference.child("users/profiles/profile_images/" + currentUser.getUid() + ".jpg");
         //final StorageReference thumb_childRef = storageReference.child("users/profile_images/profile_images/" + currentUser.getUid() + ".jpg");
 
-        try {
-            mCompressedProfileImage = new Compressor(SettingsChangeProfilePictureActivity.this).setQuality(15).compressToBitmap(mFileProfileImage);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            mCompressedProfileImage = new Compressor(SettingsChangeProfilePictureActivity.this).setQuality(15).compressToBitmap(mFileProfileImage);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         ByteArrayOutputStream mProfileBAOS = new ByteArrayOutputStream();
         mCompressedProfileImage.compress(Bitmap.CompressFormat.JPEG, 15, mProfileBAOS);

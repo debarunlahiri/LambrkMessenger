@@ -31,7 +31,6 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/textView50"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
@@ -54,7 +53,6 @@
                 android:inputType="textEmailAddress" />
 
             <TextView
-                android:id="@+id/textView51"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
@@ -76,7 +74,6 @@
                 android:inputType="textPassword" />
 
             <TextView
-                android:id="@+id/textView52"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
