@@ -2,8 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:dist="http://schemas.android.com/apk/distribution"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.lahiriproductions.lambrk_messenger" >
+    package="com.lambrk.messenger" >
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
     <dist:module dist:instant="true" />
 
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -11,7 +14,6 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="com.android.vending.BILLING" />
 
     <application
         android:exported="true"
@@ -22,63 +24,63 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Chat.ChatMediaActivity" />
-        <activity android:name=".SplashScreenActivity" />
-        <activity android:name=".UpdateAppActivity" />
-        <activity android:name=".Group.GroupActiveMembersActivity" />
-        <activity android:name=".WebViewActivity" />
-        <activity android:name=".Group.InviteGroupActivity" />
-        <activity android:name=".SetupUser.SetupActivity" />
-        <activity android:name=".TestActivity" />
-        <activity android:name=".Utils.PictureViewerActivity" />
-        <activity android:name=".Group.GroupPostCommentActivity" />
-        <activity android:name=".ExampleActivity" />
-        <activity android:name=".Utils.FollowingActivity" />
-        <activity android:name=".Group.GroupMembersActivtiy" />
-        <activity android:name=".Notifications.NotificationsActivity" />
-        <activity android:name=".Settings.SettingsChnageEmailAddressActivity" />
-        <activity android:name=".Settings.SettingsEditUserDetailsActivity" />
-        <activity android:name=".Settings.SettingsChangeUsernameActivity" />
-        <activity android:name=".Settings.SettingsChangeProfilePictureActivity" />
-        <activity android:name=".Settings.PrivacySettingsActivity" />
-        <activity android:name=".Settings.GeneralSettingsActivity" />
-        <activity android:name=".Settings.SettingsActivity" />
-        <activity android:name=".VerificationCheckActivity" />
-        <activity android:name=".SetupUser.SetupFinalActivity" />
-        <activity android:name=".SetupUser.SetupUser3Activity" />
-        <activity android:name=".SetupUser.SetupUser2Activity" />
-        <activity android:name=".SetupUser.SetupUser1Activity" />
-        <activity android:name=".Settings.ChnageBackgroundActivity" />
+        <activity android:name="com.lambrk.messenger.Chat.ChatMediaActivity" />
+        <activity android:name="com.lambrk.messenger.SplashScreenActivity" />
+        <activity android:name="com.lambrk.messenger.UpdateAppActivity" />
+        <activity android:name="com.lambrk.messenger.Group.GroupActiveMembersActivity" />
+        <activity android:name="com.lambrk.messenger.WebViewActivity" />
+        <activity android:name="com.lambrk.messenger.Group.InviteGroupActivity" />
+        <activity android:name="com.lambrk.messenger.SetupUser.SetupActivity" />
+        <activity android:name="com.lambrk.messenger.TestActivity" />
+        <activity android:name="com.lambrk.messenger.Utils.PictureViewerActivity" />
+        <activity android:name="com.lambrk.messenger.Group.GroupPostCommentActivity" />
+        <activity android:name="com.lambrk.messenger.ExampleActivity" />
+        <activity android:name="com.lambrk.messenger.Utils.FollowingActivity" />
+        <activity android:name="com.lambrk.messenger.Group.GroupMembersActivtiy" />
+        <activity android:name="com.lambrk.messenger.Notifications.NotificationsActivity" />
+        <activity android:name="com.lambrk.messenger.Settings.SettingsChnageEmailAddressActivity" />
+        <activity android:name="com.lambrk.messenger.Settings.SettingsEditUserDetailsActivity" />
+        <activity android:name="com.lambrk.messenger.Settings.SettingsChangeUsernameActivity" />
+        <activity android:name="com.lambrk.messenger.Settings.SettingsChangeProfilePictureActivity" />
+        <activity android:name="com.lambrk.messenger.Settings.PrivacySettingsActivity" />
+        <activity android:name="com.lambrk.messenger.Settings.GeneralSettingsActivity" />
+        <activity android:name="com.lambrk.messenger.Settings.SettingsActivity" />
+        <activity android:name="com.lambrk.messenger.VerificationCheckActivity" />
+        <activity android:name="com.lambrk.messenger.SetupUser.SetupFinalActivity" />
+        <activity android:name="com.lambrk.messenger.SetupUser.SetupUser3Activity" />
+        <activity android:name="com.lambrk.messenger.SetupUser.SetupUser2Activity" />
+        <activity android:name="com.lambrk.messenger.SetupUser.SetupUser1Activity" />
+        <activity android:name="com.lambrk.messenger.Settings.ChnageBackgroundActivity" />
         <activity
-            android:name=".OverallProfileActivity"
+            android:name="com.lambrk.messenger.OverallProfileActivity"
             android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".Stories.StoryLikeCommentActivity" />
-        <activity android:name=".Stories.StoryUserProfileViewerActivity" />
-        <activity android:name=".Stories.StoriesUserProfileActivity" />
-        <activity android:name=".Stories.StoriesActivity" />
-        <activity android:name=".AddStoryActivity" />
-        <activity android:name=".Group.GroupSearchActivity" />
+        <activity android:name="com.lambrk.messenger.Stories.StoryLikeCommentActivity" />
+        <activity android:name="com.lambrk.messenger.Stories.StoryUserProfileViewerActivity" />
+        <activity android:name="com.lambrk.messenger.Stories.StoriesUserProfileActivity" />
+        <activity android:name="com.lambrk.messenger.Stories.StoriesActivity" />
+        <activity android:name="com.lambrk.messenger.AddStoryActivity" />
+        <activity android:name="com.lambrk.messenger.Group.GroupSearchActivity" />
         <activity
-            android:name=".Group.GroupChatActivity"
-            android:windowSoftInputMode="stateHidden" />
-        <activity
-            android:name=".Group.GroupActivity"
-            android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".Group.CreateGroupFinalActivity" />
-        <activity android:name=".Group.GroupUserProfileActivity" />
-        <activity android:name=".Group.CreateGroupImageActivity" />
-        <activity android:name=".StartActivity" />
-        <activity android:name=".Group.CreateGroupActivity" />
-        <activity android:name=".Search.SearchActivity" />
-        <activity
-            android:name=".ProfileActivity"
+            android:name="com.lambrk.messenger.Group.GroupChatActivity"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name=".Chat.ChatActivity"
+            android:name="com.lambrk.messenger.Group.GroupActivity"
             android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".MainActivity"
+        <activity android:name="com.lambrk.messenger.Group.CreateGroupFinalActivity" />
+        <activity android:name="com.lambrk.messenger.Group.GroupUserProfileActivity" />
+        <activity android:name="com.lambrk.messenger.Group.CreateGroupImageActivity" />
+        <activity android:name="com.lambrk.messenger.StartActivity" />
+        <activity android:name="com.lambrk.messenger.Group.CreateGroupActivity" />
+        <activity android:name="com.lambrk.messenger.Search.SearchActivity" />
+        <activity
+            android:name="com.lambrk.messenger.ProfileActivity"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name="com.lambrk.messenger.Chat.ChatActivity"
+            android:windowSoftInputMode="stateHidden" />
+        <activity android:name="com.lambrk.messenger.RegisterActivity" />
+        <activity android:name="com.lambrk.messenger.LoginActivity" />
+        <activity android:name="com.lambrk.messenger.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -89,10 +91,10 @@
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
-        <activity android:name=".Settings.AboutActivity" />
+        <activity android:name="com.lambrk.messenger.Settings.AboutActivity" />
 
         <service
-            android:name=".Services.FirebaseMessagingService"
+            android:name="com.lambrk.messenger.Services.FirebaseMessagingService"
             android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

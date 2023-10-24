@@ -4,15 +4,15 @@ apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 34
     buildToolsVersion '33.0.1'
-
+    namespace 'com.lambrk.messenger'
     defaultConfig {
-        applicationId "com.lahiriproductions.lambrk_messenger"
+        applicationId "com.lambrk.messenger"
         minSdkVersion 21
-        targetSdkVersion 33
-        versionCode 12
-        versionName "1.0.11"
+        targetSdkVersion 34
+        versionCode 1
+        versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         renderscriptSupportModeEnabled true
@@ -47,6 +47,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     ndkVersion '25.2.9519653'
 }
 
@@ -60,11 +64,11 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.core:core:1.10.0-beta01'
+    implementation 'androidx.core:core:1.13.0-alpha01'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    implementation 'com.google.android.material:material:1.9.0-alpha02'
+    implementation 'com.google.android.material:material:1.11.0-beta01'
 
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
@@ -72,7 +76,7 @@ dependencies {
     implementation 'com.jsibbold:zoomage:1.2.0'
     implementation 'com.jakewharton.rxbinding3:rxbinding:3.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.3.0-rc01'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0-alpha01'
     implementation 'id.zelory:compressor:3.0.1'
     implementation 'com.github.curioustechizen.android-ago:library:1.4.0'
     implementation 'com.github.denzcoskun:ImageSlideshow:0.0.2'
@@ -84,10 +88,9 @@ dependencies {
     implementation 'com.borjabravo:readmoretextview:2.1.0'
     api 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
     implementation 'androidx.palette:palette:1.0.0'
-    implementation 'io.alterac.blurkit:blurkit:1.1.0'
 
     implementation 'io.github.ponnamkarthik:richlinkpreview:1.0.9'
-    implementation 'com.google.android.gms:play-services-auth:20.4.1'
+    implementation 'com.google.android.gms:play-services-auth:20.7.0'
 
     implementation platform('com.google.firebase:firebase-bom:26.3.0')
     implementation 'com.google.firebase:firebase-core:21.1.1'
@@ -106,18 +109,12 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-database:8.0.2'
 
     //Android Paging Libray
-    implementation 'androidx.paging:paging-runtime-ktx:3.1.1'
+    implementation 'androidx.paging:paging-runtime-ktx:3.2.1'
 
     //Firebase Pagination Library
 
     //Random Word Generator
     implementation 'com.maximeroussy.invitrode:invitrode:2.0.2'
-
-    implementation 'io.alterac.blurkit:blurkit:1.1.0'
-    implementation 'fr.tvbarthel.blurdialogfragment:lib:2.2.0'
-
-    //BlurView
-    implementation 'com.eightbitlab:supportrenderscriptblur:1.0.2'
 
     //JodaTime
     implementation 'joda-time:joda-time:2.12.2'
@@ -125,8 +122,8 @@ dependencies {
     implementation 'com.github.mirrajabi:view-effects:e355a1bac4'
 
     //Exoplayer
-    implementation 'com.google.android.exoplayer:exoplayer-dash:2.18.3'
-    implementation 'com.google.android.exoplayer:exoplayer-ui:2.18.3'
+    implementation 'com.google.android.exoplayer:exoplayer-dash:2.19.1'
+    implementation 'com.google.android.exoplayer:exoplayer-ui:2.19.1'
 
     //Dexter
     implementation 'com.karumi:dexter:6.2.3'
@@ -152,6 +149,6 @@ dependencies {
 
     implementation 'net.alhazmy13.MediaPicker:libary:2.4.4'
 
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
 
 }

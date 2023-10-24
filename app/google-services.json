@@ -8,18 +8,18 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:881085821671:android:61763eef37c59d81a8e842",
+        "mobilesdk_app_id": "1:881085821671:android:8346d31c9ea0d054a8e842",
         "android_client_info": {
-          "package_name": "com.lahiriproductions.lambrk_messenger"
+          "package_name": "com.lambrk.messenger"
         }
       },
       "oauth_client": [
         {
-          "client_id": "881085821671-vb2mm2sq9pssfef4bgggvlttjj5vdh4i.apps.googleusercontent.com",
+          "client_id": "881085821671-q7pgq9kc7pps1anicvhap85bljscsfdj.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.lahiriproductions.lambrk_messenger",
-            "certificate_hash": "b3e2b7e2a412f89fc456bb52df4461e213a4fa92"
+            "package_name": "com.lambrk.messenger",
+            "certificate_hash": "e0ecb970681df245a806c30ab7c3f910ea8cbdfd"
           }
         },
         {
